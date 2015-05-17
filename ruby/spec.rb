@@ -1,15 +1,26 @@
 # encoding: UTF-8
 
+require 'field'
+
 class Spec
 
   def initialize(doc)
     @major = doc.attributes['major']
     @minor = doc.attributes['minor']
+    @fields = {}
     puts "*** read in #{doc.attributes}"
     doc.nodes.each { |n|
       puts "*** read in #{n.name}"
     }
+
+    #puts "*** fields: #{doc.locate('fields')}"
+
     # TBD build spec from XML
+
+    doc.locate('fields').each { |n|
+      f = Field.new(n)
+      @fields[f.name] = f
+    }
   end
 
   def gen_c(f)
