@@ -17,10 +17,13 @@ class Spec
 
     # TBD build spec from XML
 
-    doc.locate('fields').each { |n|
+    puts "*** fields are"
+    doc.locate('fields')[0].nodes.each { |n|
       f = Field.new(n)
       @fields[f.name] = f
     }
+    # TBD find related fields
+
   end
 
   def gen_c(f)
@@ -34,8 +37,19 @@ class Spec
 
 extern struct _ofixVersionSpec	fix#{@major}#{@minor}Spec;
 
+// ----- Tags -----
+static struct _ofixTagSpec	tags[] = {
 |)
-    # TBD tags
+
+    @fields.values.sort_by { |x| x.tag }.each { |field|
+      field.gen_c(f)
+    }
+    f.write(%|    { 0 }
+};
+
+// ----- Messages -----
+|)
+
     # TBD messages
     # TBD spec struct
 
