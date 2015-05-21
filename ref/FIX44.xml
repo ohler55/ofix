@@ -3932,8 +3932,8 @@
     </component>
     <component name="PositionAmountData">
       <group name="NoPosAmt" required="Y">
-      <field name="PosAmtType" required="Y"/>
-      <field name="PosAmt" required="Y"/>
+	<field name="PosAmtType" required="Y"/>
+	<field name="PosAmt" required="Y"/>
       </group>
     </component>
     <component name="TrdRegTimestamps">

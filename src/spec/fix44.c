@@ -1,6 +1,5 @@
-// Copyright 2009 by Peter Ohler, All Rights Reserved
 
- /** This file is auto-generated from ref/FIX44.xml and should not be modified. **/
+// This file is auto-generated from ref/FIX44.xml and should not be modified.
 
 #include "ofix/tagspec.h"
 #include "ofix/tagreq.h"
@@ -9,7 +8,7 @@
 
 extern struct _ofixVersionSpec	fix44Spec;
 
-/***** Tags *****/
+// ----- Tags -----
 static struct _ofixTagSpec	tags[] = {
     { 1, OFIX_String, OFIX_Body, 0, 2, "1=", "Account" },
     { 2, OFIX_String, OFIX_Body, 0, 2, "2=", "AdvId" },
@@ -928,7 +927,7 @@ static struct _ofixTagSpec	tags[] = {
     { 0 }
 };
 
-/***** Messages *****/
+// ----- Messages -----
 // Heartbeat [0]
 
 static struct _ofixGroupSpec	HeartbeatGroup627 = {
