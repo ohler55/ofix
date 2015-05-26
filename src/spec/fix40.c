@@ -1,6 +1,5 @@
-// Copyright 2009 by Peter Ohler, All Rights Reserved
 
- /** This file is auto-generated from ref/FIX40.xml and should not be modified. **/
+// This file is auto-generated from ref/FIX40.xml and should not be modified.
 
 #include "ofix/tagspec.h"
 #include "ofix/tagreq.h"
@@ -9,7 +8,7 @@
 
 extern struct _ofixVersionSpec	fix40Spec;
 
-/***** Tags *****/
+// ----- Tags -----
 static struct _ofixTagSpec	tags[] = {
     { 1, OFIX_String, OFIX_Body, 0, 2, "1=", "Account" },
     { 2, OFIX_Int, OFIX_Body, 0, 2, "2=", "AdvId" },
@@ -152,7 +151,7 @@ static struct _ofixTagSpec	tags[] = {
     { 0 }
 };
 
-/***** Messages *****/
+// ----- Messages -----
 // Heartbeat [0]
 
 static ofixGroupSpec	HeartbeatGroups[] = {
@@ -160,35 +159,35 @@ static ofixGroupSpec	HeartbeatGroups[] = {
 };
 
 static struct _ofixMsgSpec	Heartbeat = {
-    &fix40Spec,		// version
-    48,			// tid
-    "0",		// type
-    "Heartbeat",		// name
+    &fix40Spec, // version
+    48, // tid
+    "0", // type
+    "Heartbeat", // name
     {0,0,0,0,0,0,0,0,1,2,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,0,0,0,0,0,4,11,0,17,0,0,0,5,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,21,8,9,0,20,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    HeartbeatGroups,	// groups
+    HeartbeatGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 112, false },	// TestReqID
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 112, false }, // TestReqID
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -200,35 +199,35 @@ static ofixGroupSpec	TestRequestGroups[] = {
 };
 
 static struct _ofixMsgSpec	TestRequest = {
-    &fix40Spec,		// version
-    49,			// tid
-    "1",		// type
-    "TestRequest",		// name
+    &fix40Spec, // version
+    49, // tid
+    "1", // type
+    "TestRequest", // name
     {0,0,0,0,0,0,0,0,1,2,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,0,0,0,0,0,4,11,0,17,0,0,0,5,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,21,8,9,0,20,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    TestRequestGroups,	// groups
+    TestRequestGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 112, true },	// TestReqID
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 112, true }, // TestReqID
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -240,36 +239,36 @@ static ofixGroupSpec	ResendRequestGroups[] = {
 };
 
 static struct _ofixMsgSpec	ResendRequest = {
-    &fix40Spec,		// version
-    50,			// tid
-    "2",		// type
-    "ResendRequest",		// name
+    &fix40Spec, // version
+    50, // tid
+    "2", // type
+    "ResendRequest", // name
     {0,0,0,0,0,0,0,19,1,2,23,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,0,0,0,0,0,4,11,0,17,0,0,0,5,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,8,9,0,21,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    ResendRequestGroups,	// groups
+    ResendRequestGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 7, true },	// BeginSeqNo
-	{ 16, true },	// EndSeqNo
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 7, true }, // BeginSeqNo
+	{ 16, true }, // EndSeqNo
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -281,36 +280,36 @@ static ofixGroupSpec	RejectGroups[] = {
 };
 
 static struct _ofixMsgSpec	Reject = {
-    &fix40Spec,		// version
-    51,			// tid
-    "3",		// type
-    "Reject",		// name
+    &fix40Spec, // version
+    51, // tid
+    "3", // type
+    "Reject", // name
     {0,0,0,0,0,0,0,0,1,2,23,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,0,19,0,0,0,4,11,0,17,0,0,0,5,12,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,8,9,0,21,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    RejectGroups,	// groups
+    RejectGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 45, true },	// RefSeqNum
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 45, true }, // RefSeqNum
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -322,36 +321,36 @@ static ofixGroupSpec	SequenceResetGroups[] = {
 };
 
 static struct _ofixMsgSpec	SequenceReset = {
-    &fix40Spec,		// version
-    52,			// tid
-    "4",		// type
-    "SequenceReset",		// name
+    &fix40Spec, // version
+    52, // tid
+    "4", // type
+    "SequenceReset", // name
     {0,0,0,0,0,0,0,0,1,2,23,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,3,20,0,0,0,0,0,0,15,0,0,0,0,0,4,11,0,17,0,0,0,5,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,8,9,0,21,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,13,0,0,0,0,0,18,19,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    SequenceResetGroups,	// groups
+    SequenceResetGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 123, false },	// GapFillFlag
-	{ 36, true },	// NewSeqNo
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 123, false }, // GapFillFlag
+	{ 36, true }, // NewSeqNo
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -363,35 +362,35 @@ static ofixGroupSpec	LogoutGroups[] = {
 };
 
 static struct _ofixMsgSpec	Logout = {
-    &fix40Spec,		// version
-    53,			// tid
-    "5",		// type
-    "Logout",		// name
+    &fix40Spec, // version
+    53, // tid
+    "5", // type
+    "Logout", // name
     {0,0,0,0,0,0,0,0,1,2,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,0,0,0,0,0,4,11,0,17,0,0,0,5,12,19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,21,8,9,0,20,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    LogoutGroups,	// groups
+    LogoutGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -403,53 +402,53 @@ static ofixGroupSpec	IndicationofInterestGroups[] = {
 };
 
 static struct _ofixMsgSpec	IndicationofInterest = {
-    &fix40Spec,		// version
-    54,			// tid
-    "6",		// type
-    "IndicationofInterest",		// name
+    &fix40Spec, // version
+    54, // tid
+    "6", // type
+    "IndicationofInterest", // name
     {0,0,0,0,0,0,0,0,1,2,40,0,0,0,0,31,0,0,0,0,0,0,25,19,34,33,21,29,20,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,30,0,0,0,24,4,11,0,17,0,28,22,5,12,37,0,0,0,32,0,0,23,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,39,8,9,0,38,0,0,0,16,0,0,0,0,0,0,36,0,26,27,0,0,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    IndicationofInterestGroups,	// groups
+    IndicationofInterestGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 23, true },	// IOIid
-	{ 28, true },	// IOITransType
-	{ 26, false },	// IOIRefID
-	{ 55, true },	// Symbol
-	{ 65, false },	// SymbolSfx
-	{ 48, false },	// SecurityID
-	{ 22, false },	// IDSource
-	{ 106, false },	// Issuer
-	{ 107, false },	// SecurityDesc
-	{ 54, true },	// Side
-	{ 27, true },	// IOIShares
-	{ 44, false },	// Price
-	{ 15, false },	// Currency
-	{ 62, false },	// ValidUntilTime
-	{ 25, false },	// IOIQltyInd
-	{ 24, false },	// IOIOthSvc
-	{ 130, false },	// IOINaturalFlag
-	{ 104, false },	// IOIQualifier
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 23, true }, // IOIid
+	{ 28, true }, // IOITransType
+	{ 26, false }, // IOIRefID
+	{ 55, true }, // Symbol
+	{ 65, false }, // SymbolSfx
+	{ 48, false }, // SecurityID
+	{ 22, false }, // IDSource
+	{ 106, false }, // Issuer
+	{ 107, false }, // SecurityDesc
+	{ 54, true }, // Side
+	{ 27, true }, // IOIShares
+	{ 44, false }, // Price
+	{ 15, false }, // Currency
+	{ 62, false }, // ValidUntilTime
+	{ 25, false }, // IOIQltyInd
+	{ 24, false }, // IOIOthSvc
+	{ 130, false }, // IOINaturalFlag
+	{ 104, false }, // IOIQualifier
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -461,49 +460,49 @@ static ofixGroupSpec	AdvertisementGroups[] = {
 };
 
 static struct _ofixMsgSpec	Advertisement = {
-    &fix40Spec,		// version
-    55,			// tid
-    "7",		// type
-    "Advertisement",		// name
+    &fix40Spec, // version
+    55, // tid
+    "7", // type
+    "Advertisement", // name
     {0,0,19,21,28,20,0,0,1,2,36,0,0,0,0,31,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,30,0,0,0,24,4,11,0,17,29,0,22,5,12,33,0,32,0,0,0,0,23,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,35,8,9,0,34,0,0,0,16,0,0,0,0,0,0,0,0,26,27,0,0,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    AdvertisementGroups,	// groups
+    AdvertisementGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 2, true },	// AdvId
-	{ 5, true },	// AdvTransType
-	{ 3, false },	// AdvRefID
-	{ 55, true },	// Symbol
-	{ 65, false },	// SymbolSfx
-	{ 48, false },	// SecurityID
-	{ 22, false },	// IDSource
-	{ 106, false },	// Issuer
-	{ 107, false },	// SecurityDesc
-	{ 4, true },	// AdvSide
-	{ 53, true },	// Shares
-	{ 44, false },	// Price
-	{ 15, false },	// Currency
-	{ 60, false },	// TransactTime
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 2, true }, // AdvId
+	{ 5, true }, // AdvTransType
+	{ 3, false }, // AdvRefID
+	{ 55, true }, // Symbol
+	{ 65, false }, // SymbolSfx
+	{ 48, false }, // SecurityID
+	{ 22, false }, // IDSource
+	{ 106, false }, // Issuer
+	{ 107, false }, // SecurityDesc
+	{ 4, true }, // AdvSide
+	{ 53, true }, // Shares
+	{ 44, false }, // Price
+	{ 15, false }, // Currency
+	{ 60, false }, // TransactTime
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -511,11 +510,11 @@ static struct _ofixMsgSpec	Advertisement = {
 // ExecutionReport [8]
 
 static struct _ofixGroupSpec	ExecutionReportGroup136 = {
-    136,	// NoRoutingIDs
+    136, // NoMiscFees
     {
-	{ 137, false },	// MiscFeeAmt
-	{ 138, false },	// MiscFeeCurr
-	{ 139, false },	// MiscFeeType
+	{ 137, false }, // MiscFeeAmt
+	{ 138, false }, // MiscFeeCurr
+	{ 139, false }, // MiscFeeType
 	{ 0, false }
     }
 };
@@ -526,79 +525,79 @@ static ofixGroupSpec	ExecutionReportGroups[] = {
 };
 
 static struct _ofixMsgSpec	ExecutionReport = {
-    &fix40Spec,		// version
-    56,			// tid
-    "8",		// type
-    "ExecutionReport",		// name
+    &fix40Spec, // version
+    56, // tid
+    "8", // type
+    "ExecutionReport", // name
     {0,29,0,0,0,0,53,0,1,2,66,20,57,58,52,43,0,24,46,26,25,0,35,0,0,0,0,0,0,51,50,49,48,0,10,3,0,19,39,27,40,0,0,15,41,0,0,47,34,4,11,0,17,0,38,32,5,12,63,44,55,0,0,30,31,33,23,0,0,0,0,0,0,0,0,54,22,0,0,0,0,0,0,0,0,0,0,0,0,65,8,9,0,64,0,0,0,16,0,42,0,0,0,28,0,0,36,37,0,21,0,0,0,56,0,6,13,0,60,61,62,0,18,0,0,0,45,0,7,14,0,0,0,0,0,0,59,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    ExecutionReportGroups,	// groups
+    ExecutionReportGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 37, true },	// OrderID
-	{ 11, false },	// ClOrdID
-	{ 109, false },	// ClientID
-	{ 76, false },	// ExecBroker
-	{ 66, false },	// ListID
-	{ 17, true },	// ExecID
-	{ 20, true },	// ExecTransType
-	{ 19, false },	// ExecRefID
-	{ 39, true },	// OrdStatus
-	{ 103, false },	// OrdRejReason
-	{ 1, false },	// Account
-	{ 63, false },	// SettlmntTyp
-	{ 64, false },	// FutSettDate
-	{ 55, true },	// Symbol
-	{ 65, false },	// SymbolSfx
-	{ 48, false },	// SecurityID
-	{ 22, false },	// IDSource
-	{ 106, false },	// Issuer
-	{ 107, false },	// SecurityDesc
-	{ 54, true },	// Side
-	{ 38, true },	// OrderQty
-	{ 40, false },	// OrdType
-	{ 44, false },	// Price
-	{ 99, false },	// StopPx
-	{ 15, false },	// Currency
-	{ 59, false },	// TimeInForce
-	{ 126, false },	// ExpireTime
-	{ 18, false },	// ExecInst
-	{ 47, false },	// Rule80A
-	{ 32, true },	// LastShares
-	{ 31, true },	// LastPx
-	{ 30, false },	// LastMkt
-	{ 29, false },	// LastCapacity
-	{ 14, true },	// CumQty
-	{ 6, true },	// AvgPx
-	{ 75, false },	// TradeDate
-	{ 60, false },	// TransactTime
-	{ 113, false },	// ReportToExch
-	{ 12, false },	// Commission
-	{ 13, false },	// CommType
-	{ 136, false },	// NoMiscFees
-	{ 118, false },	// NetMoney
-	{ 119, false },	// SettlCurrAmt
-	{ 120, false },	// SettlCurrency
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 37, true }, // OrderID
+	{ 11, false }, // ClOrdID
+	{ 109, false }, // ClientID
+	{ 76, false }, // ExecBroker
+	{ 66, false }, // ListID
+	{ 17, true }, // ExecID
+	{ 20, true }, // ExecTransType
+	{ 19, false }, // ExecRefID
+	{ 39, true }, // OrdStatus
+	{ 103, false }, // OrdRejReason
+	{ 1, false }, // Account
+	{ 63, false }, // SettlmntTyp
+	{ 64, false }, // FutSettDate
+	{ 55, true }, // Symbol
+	{ 65, false }, // SymbolSfx
+	{ 48, false }, // SecurityID
+	{ 22, false }, // IDSource
+	{ 106, false }, // Issuer
+	{ 107, false }, // SecurityDesc
+	{ 54, true }, // Side
+	{ 38, true }, // OrderQty
+	{ 40, false }, // OrdType
+	{ 44, false }, // Price
+	{ 99, false }, // StopPx
+	{ 15, false }, // Currency
+	{ 59, false }, // TimeInForce
+	{ 126, false }, // ExpireTime
+	{ 18, false }, // ExecInst
+	{ 47, false }, // Rule80A
+	{ 32, true }, // LastShares
+	{ 31, true }, // LastPx
+	{ 30, false }, // LastMkt
+	{ 29, false }, // LastCapacity
+	{ 14, true }, // CumQty
+	{ 6, true }, // AvgPx
+	{ 75, false }, // TradeDate
+	{ 60, false }, // TransactTime
+	{ 113, false }, // ReportToExch
+	{ 12, false }, // Commission
+	{ 13, false }, // CommType
+	{ 136, false }, // NoMiscFees
+	{ 118, false }, // NetMoney
+	{ 119, false }, // SettlCurrAmt
+	{ 120, false }, // SettlCurrency
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -610,41 +609,41 @@ static ofixGroupSpec	OrderCancelRejectGroups[] = {
 };
 
 static struct _ofixMsgSpec	OrderCancelReject = {
-    &fix40Spec,		// version
-    57,			// tid
-    "9",		// type
-    "OrderCancelReject",		// name
+    &fix40Spec, // version
+    57, // tid
+    "9", // type
+    "OrderCancelReject", // name
     {0,0,0,0,0,0,0,0,1,2,28,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,3,0,19,0,0,0,0,0,15,0,0,0,0,0,4,11,0,17,0,0,0,5,12,25,0,0,0,0,0,0,0,23,0,0,0,0,0,0,0,0,0,22,0,0,0,0,0,0,0,0,0,0,0,0,27,8,9,0,26,0,0,0,16,0,0,0,0,24,0,0,0,0,0,0,21,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    OrderCancelRejectGroups,	// groups
+    OrderCancelRejectGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 37, true },	// OrderID
-	{ 11, true },	// ClOrdID
-	{ 109, false },	// ClientID
-	{ 76, false },	// ExecBroker
-	{ 66, false },	// ListID
-	{ 102, false },	// CxlRejReason
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 37, true }, // OrderID
+	{ 11, true }, // ClOrdID
+	{ 109, false }, // ClientID
+	{ 76, false }, // ExecBroker
+	{ 66, false }, // ListID
+	{ 102, false }, // CxlRejReason
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -656,38 +655,38 @@ static ofixGroupSpec	LogonGroups[] = {
 };
 
 static struct _ofixMsgSpec	Logon = {
-    &fix40Spec,		// version
-    65,			// tid
-    "A",		// type
-    "Logon",		// name
+    &fix40Spec, // version
+    65, // tid
+    "A", // type
+    "Logon", // name
     {0,0,0,0,0,0,0,0,1,2,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,0,0,0,0,0,4,11,0,17,0,0,0,5,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,8,9,0,23,0,21,22,16,19,0,0,0,0,0,0,0,0,0,20,0,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    LogonGroups,	// groups
+    LogonGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 98, true },	// EncryptMethod
-	{ 108, true },	// HeartBtInt
-	{ 95, false },	// RawDataLength
-	{ 96, false },	// RawData
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 98, true }, // EncryptMethod
+	{ 108, true }, // HeartBtInt
+	{ 95, false }, // RawDataLength
+	{ 96, false }, // RawData
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -695,9 +694,9 @@ static struct _ofixMsgSpec	Logon = {
 // News [B]
 
 static struct _ofixGroupSpec	NewsGroup33 = {
-    33,	// NoRoutingIDs
+    33, // LinesOfText
     {
-	{ 58, true },	// Text
+	{ 58, true }, // Text
 	{ 0, false }
     }
 };
@@ -708,40 +707,40 @@ static ofixGroupSpec	NewsGroups[] = {
 };
 
 static struct _ofixMsgSpec	News = {
-    &fix40Spec,		// version
-    66,			// tid
-    "B",		// type
-    "News",		// name
+    &fix40Spec, // version
+    66, // tid
+    "B", // type
+    "News", // name
     {0,0,0,0,0,0,0,0,1,2,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,10,3,0,0,0,0,0,0,19,15,0,0,21,0,0,4,11,0,17,0,0,0,5,12,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,26,8,9,0,25,0,23,24,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    NewsGroups,	// groups
+    NewsGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 42, false },	// OrigTime
-	{ 61, false },	// Urgency
-	{ 46, false },	// RelatdSym
-	{ 33, true },	// LinesOfText
-	{ 95, false },	// RawDataLength
-	{ 96, false },	// RawData
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 42, false }, // OrigTime
+	{ 61, false }, // Urgency
+	{ 46, false }, // RelatdSym
+	{ 33, true }, // LinesOfText
+	{ 95, false }, // RawDataLength
+	{ 96, false }, // RawData
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -749,9 +748,9 @@ static struct _ofixMsgSpec	News = {
 // Email [C]
 
 static struct _ofixGroupSpec	EmailGroup33 = {
-    33,	// NoRoutingIDs
+    33, // LinesOfText
     {
-	{ 58, true },	// Text
+	{ 58, true }, // Text
 	{ 0, false }
     }
 };
@@ -762,42 +761,42 @@ static ofixGroupSpec	EmailGroups[] = {
 };
 
 static struct _ofixMsgSpec	Email = {
-    &fix40Spec,		// version
-    67,			// tid
-    "C",		// type
-    "Email",		// name
+    &fix40Spec, // version
+    67, // tid
+    "C", // type
+    "Email", // name
     {0,0,0,0,0,0,0,0,1,2,29,23,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,10,3,0,22,0,0,0,0,20,15,0,0,21,0,0,4,11,0,17,0,0,0,5,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,28,8,9,0,27,19,25,26,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    EmailGroups,	// groups
+    EmailGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 94, true },	// EmailType
-	{ 42, false },	// OrigTime
-	{ 46, false },	// RelatdSym
-	{ 37, false },	// OrderID
-	{ 11, false },	// ClOrdID
-	{ 33, true },	// LinesOfText
-	{ 95, false },	// RawDataLength
-	{ 96, false },	// RawData
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 94, true }, // EmailType
+	{ 42, false }, // OrigTime
+	{ 46, false }, // RelatdSym
+	{ 37, false }, // OrderID
+	{ 11, false }, // ClOrdID
+	{ 33, true }, // LinesOfText
+	{ 95, false }, // RawDataLength
+	{ 96, false }, // RawData
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -809,70 +808,70 @@ static ofixGroupSpec	NewOrderSingleGroups[] = {
 };
 
 static struct _ofixMsgSpec	NewOrderSingle = {
-    &fix40Spec,		// version
-    68,			// tid
-    "D",		// type
-    "NewOrderSingle",		// name
+    &fix40Spec, // version
+    68, // tid
+    "D", // type
+    "NewOrderSingle", // name
     {0,22,0,0,0,0,0,0,1,2,57,19,49,50,0,44,0,0,26,0,0,25,34,45,0,0,0,0,0,0,0,0,0,0,10,3,0,0,40,0,41,0,0,15,42,0,0,51,33,4,11,0,17,0,38,31,5,12,54,47,0,0,0,23,24,32,0,0,0,0,0,0,0,0,0,0,21,0,0,0,0,30,0,0,0,0,0,0,0,56,8,9,0,55,0,0,0,16,0,43,29,0,0,0,0,0,35,36,0,20,27,28,0,0,39,6,13,46,0,0,53,52,18,0,0,0,48,0,7,14,0,0,0,0,0,0,0,0,0,0,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    NewOrderSingleGroups,	// groups
+    NewOrderSingleGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 11, true },	// ClOrdID
-	{ 109, false },	// ClientID
-	{ 76, false },	// ExecBroker
-	{ 1, false },	// Account
-	{ 63, false },	// SettlmntTyp
-	{ 64, false },	// FutSettDate
-	{ 21, true },	// HandlInst
-	{ 18, false },	// ExecInst
-	{ 110, false },	// MinQty
-	{ 111, false },	// MaxFloor
-	{ 100, false },	// ExDestination
-	{ 81, false },	// ProcessCode
-	{ 55, true },	// Symbol
-	{ 65, false },	// SymbolSfx
-	{ 48, false },	// SecurityID
-	{ 22, false },	// IDSource
-	{ 106, false },	// Issuer
-	{ 107, false },	// SecurityDesc
-	{ 140, false },	// PrevClosePx
-	{ 54, true },	// Side
-	{ 114, false },	// LocateReqd
-	{ 38, true },	// OrderQty
-	{ 40, true },	// OrdType
-	{ 44, false },	// Price
-	{ 99, false },	// StopPx
-	{ 15, false },	// Currency
-	{ 23, false },	// IOIid
-	{ 117, false },	// QuoteID
-	{ 59, false },	// TimeInForce
-	{ 126, false },	// ExpireTime
-	{ 12, false },	// Commission
-	{ 13, false },	// CommType
-	{ 47, false },	// Rule80A
-	{ 121, false },	// ForexReq
-	{ 120, false },	// SettlCurrency
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 11, true }, // ClOrdID
+	{ 109, false }, // ClientID
+	{ 76, false }, // ExecBroker
+	{ 1, false }, // Account
+	{ 63, false }, // SettlmntTyp
+	{ 64, false }, // FutSettDate
+	{ 21, true }, // HandlInst
+	{ 18, false }, // ExecInst
+	{ 110, false }, // MinQty
+	{ 111, false }, // MaxFloor
+	{ 100, false }, // ExDestination
+	{ 81, false }, // ProcessCode
+	{ 55, true }, // Symbol
+	{ 65, false }, // SymbolSfx
+	{ 48, false }, // SecurityID
+	{ 22, false }, // IDSource
+	{ 106, false }, // Issuer
+	{ 107, false }, // SecurityDesc
+	{ 140, false }, // PrevClosePx
+	{ 54, true }, // Side
+	{ 114, false }, // LocateReqd
+	{ 38, true }, // OrderQty
+	{ 40, true }, // OrdType
+	{ 44, false }, // Price
+	{ 99, false }, // StopPx
+	{ 15, false }, // Currency
+	{ 23, false }, // IOIid
+	{ 117, false }, // QuoteID
+	{ 59, false }, // TimeInForce
+	{ 126, false }, // ExpireTime
+	{ 12, false }, // Commission
+	{ 13, false }, // CommType
+	{ 47, false }, // Rule80A
+	{ 121, false }, // ForexReq
+	{ 120, false }, // SettlCurrency
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -884,73 +883,73 @@ static ofixGroupSpec	NewOrderListGroups[] = {
 };
 
 static struct _ofixMsgSpec	NewOrderList = {
-    &fix40Spec,		// version
-    69,			// tid
-    "E",		// type
-    "NewOrderList",		// name
+    &fix40Spec, // version
+    69, // tid
+    "E", // type
+    "NewOrderList", // name
     {0,27,0,0,0,0,0,0,1,2,60,24,52,53,0,49,0,0,31,0,0,30,39,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,45,0,46,0,0,15,47,0,0,54,38,4,11,0,17,0,43,36,5,12,57,50,0,0,0,28,29,37,19,21,22,23,0,0,0,0,0,0,26,0,0,0,0,35,0,0,0,0,0,0,0,59,8,9,0,58,0,0,0,16,0,48,34,0,0,0,0,20,40,41,0,25,32,33,0,0,44,6,13,0,0,0,56,55,18,0,0,0,51,0,7,14,0,0,0,0,0,0,0,0,0,0,42,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    NewOrderListGroups,	// groups
+    NewOrderListGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 66, true },	// ListID
-	{ 105, false },	// WaveNo
-	{ 67, true },	// ListSeqNo
-	{ 68, true },	// ListNoOrds
-	{ 69, false },	// ListExecInst
-	{ 11, true },	// ClOrdID
-	{ 109, false },	// ClientID
-	{ 76, false },	// ExecBroker
-	{ 1, false },	// Account
-	{ 63, false },	// SettlmntTyp
-	{ 64, false },	// FutSettDate
-	{ 21, true },	// HandlInst
-	{ 18, false },	// ExecInst
-	{ 110, false },	// MinQty
-	{ 111, false },	// MaxFloor
-	{ 100, false },	// ExDestination
-	{ 81, false },	// ProcessCode
-	{ 55, true },	// Symbol
-	{ 65, false },	// SymbolSfx
-	{ 48, false },	// SecurityID
-	{ 22, false },	// IDSource
-	{ 106, false },	// Issuer
-	{ 107, false },	// SecurityDesc
-	{ 140, false },	// PrevClosePx
-	{ 54, true },	// Side
-	{ 114, false },	// LocateReqd
-	{ 38, true },	// OrderQty
-	{ 40, true },	// OrdType
-	{ 44, false },	// Price
-	{ 99, false },	// StopPx
-	{ 15, false },	// Currency
-	{ 59, false },	// TimeInForce
-	{ 126, false },	// ExpireTime
-	{ 12, false },	// Commission
-	{ 13, false },	// CommType
-	{ 47, false },	// Rule80A
-	{ 121, false },	// ForexReq
-	{ 120, false },	// SettlCurrency
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 66, true }, // ListID
+	{ 105, false }, // WaveNo
+	{ 67, true }, // ListSeqNo
+	{ 68, true }, // ListNoOrds
+	{ 69, false }, // ListExecInst
+	{ 11, true }, // ClOrdID
+	{ 109, false }, // ClientID
+	{ 76, false }, // ExecBroker
+	{ 1, false }, // Account
+	{ 63, false }, // SettlmntTyp
+	{ 64, false }, // FutSettDate
+	{ 21, true }, // HandlInst
+	{ 18, false }, // ExecInst
+	{ 110, false }, // MinQty
+	{ 111, false }, // MaxFloor
+	{ 100, false }, // ExDestination
+	{ 81, false }, // ProcessCode
+	{ 55, true }, // Symbol
+	{ 65, false }, // SymbolSfx
+	{ 48, false }, // SecurityID
+	{ 22, false }, // IDSource
+	{ 106, false }, // Issuer
+	{ 107, false }, // SecurityDesc
+	{ 140, false }, // PrevClosePx
+	{ 54, true }, // Side
+	{ 114, false }, // LocateReqd
+	{ 38, true }, // OrderQty
+	{ 40, true }, // OrdType
+	{ 44, false }, // Price
+	{ 99, false }, // StopPx
+	{ 15, false }, // Currency
+	{ 59, false }, // TimeInForce
+	{ 126, false }, // ExpireTime
+	{ 12, false }, // Commission
+	{ 13, false }, // CommType
+	{ 47, false }, // Rule80A
+	{ 121, false }, // ForexReq
+	{ 120, false }, // SettlCurrency
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -962,50 +961,50 @@ static ofixGroupSpec	OrderCancelRequestGroups[] = {
 };
 
 static struct _ofixMsgSpec	OrderCancelRequest = {
-    &fix40Spec,		// version
-    70,			// tid
-    "F",		// type
-    "OrderCancelRequest",		// name
+    &fix40Spec, // version
+    70, // tid
+    "F", // type
+    "OrderCancelRequest", // name
     {0,0,0,0,0,0,0,0,1,2,37,21,0,0,0,0,0,0,0,0,0,0,29,0,0,0,0,0,0,0,0,0,0,0,10,3,0,20,33,0,0,19,0,15,0,0,0,0,28,4,11,0,17,0,32,26,5,12,34,0,0,0,0,0,0,27,22,0,0,0,0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,36,8,9,0,35,0,0,0,16,0,0,0,0,0,0,0,0,30,31,0,24,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,23,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    OrderCancelRequestGroups,	// groups
+    OrderCancelRequestGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 41, true },	// OrigClOrdID
-	{ 37, false },	// OrderID
-	{ 11, true },	// ClOrdID
-	{ 66, false },	// ListID
-	{ 125, true },	// CxlType
-	{ 109, false },	// ClientID
-	{ 76, false },	// ExecBroker
-	{ 55, true },	// Symbol
-	{ 65, false },	// SymbolSfx
-	{ 48, false },	// SecurityID
-	{ 22, false },	// IDSource
-	{ 106, false },	// Issuer
-	{ 107, false },	// SecurityDesc
-	{ 54, true },	// Side
-	{ 38, true },	// OrderQty
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 41, true }, // OrigClOrdID
+	{ 37, false }, // OrderID
+	{ 11, true }, // ClOrdID
+	{ 66, false }, // ListID
+	{ 125, true }, // CxlType
+	{ 109, false }, // ClientID
+	{ 76, false }, // ExecBroker
+	{ 55, true }, // Symbol
+	{ 65, false }, // SymbolSfx
+	{ 48, false }, // SecurityID
+	{ 22, false }, // IDSource
+	{ 106, false }, // Issuer
+	{ 107, false }, // SecurityDesc
+	{ 54, true }, // Side
+	{ 38, true }, // OrderQty
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -1017,68 +1016,68 @@ static ofixGroupSpec	OrderCancelReplaceRequestGroups[] = {
 };
 
 static struct _ofixMsgSpec	OrderCancelReplaceRequest = {
-    &fix40Spec,		// version
-    71,			// tid
-    "G",		// type
-    "OrderCancelReplaceRequest",		// name
+    &fix40Spec, // version
+    71, // tid
+    "G", // type
+    "OrderCancelReplaceRequest", // name
     {0,25,0,0,0,0,0,0,1,2,55,23,47,48,0,44,0,0,29,0,0,28,36,0,0,0,0,0,0,0,0,0,0,0,10,3,0,19,40,0,41,22,0,15,42,0,0,49,35,4,11,0,17,0,39,33,5,12,52,45,0,0,0,26,27,34,24,0,0,0,0,0,0,0,0,0,21,0,0,0,0,0,0,0,0,0,0,0,0,54,8,9,0,53,0,0,0,16,0,43,32,0,0,0,0,0,37,38,0,20,30,31,0,0,0,6,13,0,0,0,51,50,18,0,0,0,46,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    OrderCancelReplaceRequestGroups,	// groups
+    OrderCancelReplaceRequestGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 37, false },	// OrderID
-	{ 109, false },	// ClientID
-	{ 76, false },	// ExecBroker
-	{ 41, true },	// OrigClOrdID
-	{ 11, true },	// ClOrdID
-	{ 66, false },	// ListID
-	{ 1, false },	// Account
-	{ 63, false },	// SettlmntTyp
-	{ 64, false },	// FutSettDate
-	{ 21, true },	// HandlInst
-	{ 18, false },	// ExecInst
-	{ 110, false },	// MinQty
-	{ 111, false },	// MaxFloor
-	{ 100, false },	// ExDestination
-	{ 55, true },	// Symbol
-	{ 65, false },	// SymbolSfx
-	{ 48, false },	// SecurityID
-	{ 22, false },	// IDSource
-	{ 106, false },	// Issuer
-	{ 107, false },	// SecurityDesc
-	{ 54, true },	// Side
-	{ 38, true },	// OrderQty
-	{ 40, true },	// OrdType
-	{ 44, false },	// Price
-	{ 99, false },	// StopPx
-	{ 15, false },	// Currency
-	{ 59, false },	// TimeInForce
-	{ 126, false },	// ExpireTime
-	{ 12, false },	// Commission
-	{ 13, false },	// CommType
-	{ 47, false },	// Rule80A
-	{ 121, false },	// ForexReq
-	{ 120, false },	// SettlCurrency
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 37, false }, // OrderID
+	{ 109, false }, // ClientID
+	{ 76, false }, // ExecBroker
+	{ 41, true }, // OrigClOrdID
+	{ 11, true }, // ClOrdID
+	{ 66, false }, // ListID
+	{ 1, false }, // Account
+	{ 63, false }, // SettlmntTyp
+	{ 64, false }, // FutSettDate
+	{ 21, true }, // HandlInst
+	{ 18, false }, // ExecInst
+	{ 110, false }, // MinQty
+	{ 111, false }, // MaxFloor
+	{ 100, false }, // ExDestination
+	{ 55, true }, // Symbol
+	{ 65, false }, // SymbolSfx
+	{ 48, false }, // SecurityID
+	{ 22, false }, // IDSource
+	{ 106, false }, // Issuer
+	{ 107, false }, // SecurityDesc
+	{ 54, true }, // Side
+	{ 38, true }, // OrderQty
+	{ 40, true }, // OrdType
+	{ 44, false }, // Price
+	{ 99, false }, // StopPx
+	{ 15, false }, // Currency
+	{ 59, false }, // TimeInForce
+	{ 126, false }, // ExpireTime
+	{ 12, false }, // Commission
+	{ 13, false }, // CommType
+	{ 47, false }, // Rule80A
+	{ 121, false }, // ForexReq
+	{ 120, false }, // SettlCurrency
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -1090,43 +1089,43 @@ static ofixGroupSpec	OrderStatusRequestGroups[] = {
 };
 
 static struct _ofixMsgSpec	OrderStatusRequest = {
-    &fix40Spec,		// version
-    72,			// tid
-    "H",		// type
-    "OrderStatusRequest",		// name
+    &fix40Spec, // version
+    72, // tid
+    "H", // type
+    "OrderStatusRequest", // name
     {0,0,0,0,0,0,0,0,1,2,30,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,3,0,19,0,0,0,0,0,15,0,0,0,0,0,4,11,0,17,0,27,23,5,12,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,0,0,0,22,0,0,0,0,0,0,0,0,0,0,0,0,29,8,9,0,28,0,0,0,16,0,0,0,0,0,0,0,0,25,26,0,21,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    OrderStatusRequestGroups,	// groups
+    OrderStatusRequestGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 37, false },	// OrderID
-	{ 11, true },	// ClOrdID
-	{ 109, false },	// ClientID
-	{ 76, false },	// ExecBroker
-	{ 55, true },	// Symbol
-	{ 65, false },	// SymbolSfx
-	{ 106, false },	// Issuer
-	{ 107, false },	// SecurityDesc
-	{ 54, true },	// Side
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 37, false }, // OrderID
+	{ 11, true }, // ClOrdID
+	{ 109, false }, // ClientID
+	{ 76, false }, // ExecBroker
+	{ 55, true }, // Symbol
+	{ 65, false }, // SymbolSfx
+	{ 106, false }, // Issuer
+	{ 107, false }, // SecurityDesc
+	{ 54, true }, // Side
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -1134,57 +1133,57 @@ static struct _ofixMsgSpec	OrderStatusRequest = {
 // Allocation [J]
 
 static struct _ofixGroupSpec	AllocationGroup73 = {
-    73,	// NoRoutingIDs
+    73, // NoOrders
     {
-	{ 11, true },	// ClOrdID
-	{ 37, false },	// OrderID
-	{ 66, false },	// ListID
-	{ 105, false },	// WaveNo
+	{ 11, true }, // ClOrdID
+	{ 37, false }, // OrderID
+	{ 66, false }, // ListID
+	{ 105, false }, // WaveNo
 	{ 0, false }
     }
 };
 
 static struct _ofixGroupSpec	AllocationGroup124 = {
-    124,	// NoRoutingIDs
+    124, // NoExecs
     {
-	{ 17, false },	// ExecID
-	{ 32, false },	// LastShares
-	{ 31, false },	// LastPx
-	{ 30, false },	// LastMkt
+	{ 17, false }, // ExecID
+	{ 32, false }, // LastShares
+	{ 31, false }, // LastPx
+	{ 30, false }, // LastMkt
 	{ 0, false }
     }
 };
 
 static struct _ofixGroupSpec	AllocationGroup136 = {
-    136,	// NoRoutingIDs
+    136, // NoMiscFees
     {
-	{ 137, false },	// MiscFeeAmt
-	{ 138, false },	// MiscFeeCurr
-	{ 139, false },	// MiscFeeType
-	{ 0, false }
-    }
-};
-
-static struct _ofixGroupSpec	AllocationGroup85 = {
-    85,	// NoRoutingIDs
-    {
-	{ 92, false },	// BrokerOfCredit
-	{ 86, false },	// DlvyInst
+	{ 137, false }, // MiscFeeAmt
+	{ 138, false }, // MiscFeeCurr
+	{ 139, false }, // MiscFeeType
 	{ 0, false }
     }
 };
 
 static struct _ofixGroupSpec	AllocationGroup78 = {
-    78,	// NoRoutingIDs
+    78, // NoAllocs
     {
-	{ 79, true },	// AllocAccount
-	{ 80, true },	// AllocShares
-	{ 81, false },	// ProcessCode
-	{ 76, false },	// ExecBroker
-	{ 109, false },	// ClientID
-	{ 12, false },	// Commission
-	{ 13, false },	// CommType
-	{ 85, false },	// NoDlvyInst
+	{ 79, true }, // AllocAccount
+	{ 80, true }, // AllocShares
+	{ 81, false }, // ProcessCode
+	{ 76, false }, // ExecBroker
+	{ 109, false }, // ClientID
+	{ 12, false }, // Commission
+	{ 13, false }, // CommType
+	{ 85, false }, // NoDlvyInst
+	{ 0, false }
+    }
+};
+
+static struct _ofixGroupSpec	AllocationGroup85 = {
+    85, // NoDlvyInst
+    {
+	{ 92, false }, // BrokerOfCredit
+	{ 86, false }, // DlvyInst
 	{ 0, false }
     }
 };
@@ -1193,67 +1192,67 @@ static ofixGroupSpec	AllocationGroups[] = {
     &AllocationGroup73,
     &AllocationGroup124,
     &AllocationGroup136,
-    &AllocationGroup85,
     &AllocationGroup78,
+    &AllocationGroup85,
     0
 };
 
 static struct _ofixMsgSpec	Allocation = {
-    &fix40Spec,		// version
-    74,			// tid
-    "J",		// type
-    "Allocation",		// name
+    &fix40Spec, // version
+    74, // tid
+    "J", // type
+    "Allocation", // name
     {0,0,0,0,0,0,32,0,1,2,48,0,0,0,0,33,0,0,0,0,0,0,28,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,0,0,0,0,27,4,11,0,17,31,24,25,5,12,44,0,36,0,0,37,38,26,0,0,0,0,19,20,21,22,34,35,0,43,45,0,0,0,0,0,0,0,0,0,0,47,8,9,0,46,0,0,0,16,0,0,0,0,0,0,0,0,29,30,0,0,0,0,0,0,0,6,13,0,39,41,42,0,18,0,23,0,0,0,7,14,0,0,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    AllocationGroups,	// groups
+    AllocationGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 70, true },	// AllocID
-	{ 71, true },	// AllocTransType
-	{ 72, false },	// RefAllocID
-	{ 73, true },	// NoOrders
-	{ 124, false },	// NoExecs
-	{ 54, true },	// Side
-	{ 55, true },	// Symbol
-	{ 65, false },	// SymbolSfx
-	{ 48, false },	// SecurityID
-	{ 22, false },	// IDSource
-	{ 106, false },	// Issuer
-	{ 107, false },	// SecurityDesc
-	{ 53, true },	// Shares
-	{ 6, true },	// AvgPx
-	{ 15, false },	// Currency
-	{ 74, false },	// AvgPrxPrecision
-	{ 75, true },	// TradeDate
-	{ 60, false },	// TransactTime
-	{ 63, false },	// SettlmntTyp
-	{ 64, false },	// FutSettDate
-	{ 118, false },	// NetMoney
-	{ 136, false },	// NoMiscFees
-	{ 119, false },	// SettlCurrAmt
-	{ 120, false },	// SettlCurrency
-	{ 77, false },	// OpenClose
-	{ 58, false },	// Text
-	{ 78, true },	// NoAllocs
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 70, true }, // AllocID
+	{ 71, true }, // AllocTransType
+	{ 72, false }, // RefAllocID
+	{ 73, true }, // NoOrders
+	{ 124, false }, // NoExecs
+	{ 54, true }, // Side
+	{ 55, true }, // Symbol
+	{ 65, false }, // SymbolSfx
+	{ 48, false }, // SecurityID
+	{ 22, false }, // IDSource
+	{ 106, false }, // Issuer
+	{ 107, false }, // SecurityDesc
+	{ 53, true }, // Shares
+	{ 6, true }, // AvgPx
+	{ 15, false }, // Currency
+	{ 74, false }, // AvgPrxPrecision
+	{ 75, true }, // TradeDate
+	{ 60, false }, // TransactTime
+	{ 63, false }, // SettlmntTyp
+	{ 64, false }, // FutSettDate
+	{ 118, false }, // NetMoney
+	{ 136, false }, // NoMiscFees
+	{ 119, false }, // SettlCurrAmt
+	{ 120, false }, // SettlCurrency
+	{ 77, false }, // OpenClose
+	{ 58, false }, // Text
+	{ 78, true }, // NoAllocs
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -1265,37 +1264,37 @@ static ofixGroupSpec	ListCancelRequestGroups[] = {
 };
 
 static struct _ofixMsgSpec	ListCancelRequest = {
-    &fix40Spec,		// version
-    75,			// tid
-    "K",		// type
-    "ListCancelRequest",		// name
+    &fix40Spec, // version
+    75, // tid
+    "K", // type
+    "ListCancelRequest", // name
     {0,0,0,0,0,0,0,0,1,2,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,0,0,0,0,0,4,11,0,17,0,0,0,5,12,21,0,0,0,0,0,0,0,19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,8,9,0,22,0,0,0,16,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    ListCancelRequestGroups,	// groups
+    ListCancelRequestGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 66, true },	// ListID
-	{ 105, false },	// WaveNo
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 66, true }, // ListID
+	{ 105, false }, // WaveNo
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -1307,37 +1306,37 @@ static ofixGroupSpec	ListExecuteGroups[] = {
 };
 
 static struct _ofixMsgSpec	ListExecute = {
-    &fix40Spec,		// version
-    76,			// tid
-    "L",		// type
-    "ListExecute",		// name
+    &fix40Spec, // version
+    76, // tid
+    "L", // type
+    "ListExecute", // name
     {0,0,0,0,0,0,0,0,1,2,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,0,0,0,0,0,4,11,0,17,0,0,0,5,12,21,0,0,0,0,0,0,0,19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,8,9,0,22,0,0,0,16,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    ListExecuteGroups,	// groups
+    ListExecuteGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 66, true },	// ListID
-	{ 105, false },	// WaveNo
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 66, true }, // ListID
+	{ 105, false }, // WaveNo
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -1349,37 +1348,37 @@ static ofixGroupSpec	ListStatusRequestGroups[] = {
 };
 
 static struct _ofixMsgSpec	ListStatusRequest = {
-    &fix40Spec,		// version
-    77,			// tid
-    "M",		// type
-    "ListStatusRequest",		// name
+    &fix40Spec, // version
+    77, // tid
+    "M", // type
+    "ListStatusRequest", // name
     {0,0,0,0,0,0,0,0,1,2,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,0,0,0,0,0,4,11,0,17,0,0,0,5,12,21,0,0,0,0,0,0,0,19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,8,9,0,22,0,0,0,16,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    ListStatusRequestGroups,	// groups
+    ListStatusRequestGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 66, true },	// ListID
-	{ 105, false },	// WaveNo
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 66, true }, // ListID
+	{ 105, false }, // WaveNo
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -1387,12 +1386,12 @@ static struct _ofixMsgSpec	ListStatusRequest = {
 // ListStatus [N]
 
 static struct _ofixGroupSpec	ListStatusGroup73 = {
-    73,	// NoRoutingIDs
+    73, // NoOrders
     {
-	{ 11, true },	// ClOrdID
-	{ 14, true },	// CumQty
-	{ 84, true },	// CxlQty
-	{ 6, true },	// AvgPx
+	{ 11, true }, // ClOrdID
+	{ 14, true }, // CumQty
+	{ 84, true }, // CxlQty
+	{ 6, true }, // AvgPx
 	{ 0, false }
     }
 };
@@ -1403,39 +1402,39 @@ static ofixGroupSpec	ListStatusGroups[] = {
 };
 
 static struct _ofixMsgSpec	ListStatus = {
-    &fix40Spec,		// version
-    78,			// tid
-    "N",		// type
-    "ListStatus",		// name
+    &fix40Spec, // version
+    78, // tid
+    "N", // type
+    "ListStatus", // name
     {0,0,0,0,0,0,0,0,1,2,26,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,0,0,0,0,0,4,11,0,17,0,0,0,5,12,0,0,0,0,0,0,0,0,19,0,0,0,0,0,0,23,0,0,0,0,0,0,0,0,21,22,0,0,0,0,0,25,8,9,0,24,0,0,0,16,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    ListStatusGroups,	// groups
+    ListStatusGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 66, true },	// ListID
-	{ 105, false },	// WaveNo
-	{ 82, true },	// NoRpts
-	{ 83, true },	// RptSeq
-	{ 73, true },	// NoOrders
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 66, true }, // ListID
+	{ 105, false }, // WaveNo
+	{ 82, true }, // NoRpts
+	{ 83, true }, // RptSeq
+	{ 73, true }, // NoOrders
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -1447,42 +1446,42 @@ static ofixGroupSpec	AllocationACKGroups[] = {
 };
 
 static struct _ofixMsgSpec	AllocationACK = {
-    &fix40Spec,		// version
-    80,			// tid
-    "P",		// type
-    "AllocationACK",		// name
+    &fix40Spec, // version
+    80, // tid
+    "P", // type
+    "AllocationACK", // name
     {0,0,0,0,0,0,0,0,1,2,29,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,0,0,0,0,0,4,11,0,17,0,0,0,5,12,26,0,23,0,0,0,0,0,0,0,0,0,21,0,0,0,0,22,20,0,0,0,0,0,0,0,0,0,0,24,25,28,8,9,0,27,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,19,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    AllocationACKGroups,	// groups
+    AllocationACKGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 109, false },	// ClientID
-	{ 76, false },	// ExecBroker
-	{ 70, true },	// AllocID
-	{ 75, true },	// TradeDate
-	{ 60, false },	// TransactTime
-	{ 87, true },	// AllocStatus
-	{ 88, false },	// AllocRejCode
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 109, false }, // ClientID
+	{ 76, false }, // ExecBroker
+	{ 70, true }, // AllocID
+	{ 75, true }, // TradeDate
+	{ 60, false }, // TransactTime
+	{ 87, true }, // AllocStatus
+	{ 88, false }, // AllocRejCode
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -1494,43 +1493,43 @@ static ofixGroupSpec	DontKnowTradeGroups[] = {
 };
 
 static struct _ofixMsgSpec	DontKnowTrade = {
-    &fix40Spec,		// version
-    81,			// tid
-    "Q",		// type
-    "DontKnowTrade",		// name
+    &fix40Spec, // version
+    81, // tid
+    "Q", // type
+    "DontKnowTrade", // name
     {0,0,0,0,0,0,0,0,1,2,30,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,26,25,0,10,3,0,19,24,0,0,0,0,15,0,0,0,0,0,4,11,0,17,0,23,22,5,12,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,29,8,9,0,28,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,21,7,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    DontKnowTradeGroups,	// groups
+    DontKnowTradeGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 37, false },	// OrderID
-	{ 17, false },	// ExecID
-	{ 127, true },	// DKReason
-	{ 55, true },	// Symbol
-	{ 54, true },	// Side
-	{ 38, true },	// OrderQty
-	{ 32, true },	// LastShares
-	{ 31, true },	// LastPx
-	{ 58, false },	// Text
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 37, false }, // OrderID
+	{ 17, false }, // ExecID
+	{ 127, true }, // DKReason
+	{ 55, true }, // Symbol
+	{ 54, true }, // Side
+	{ 38, true }, // OrderQty
+	{ 32, true }, // LastShares
+	{ 31, true }, // LastPx
+	{ 58, false }, // Text
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -1542,44 +1541,44 @@ static ofixGroupSpec	QuoteRequestGroups[] = {
 };
 
 static struct _ofixMsgSpec	QuoteRequest = {
-    &fix40Spec,		// version
-    82,			// tid
-    "R",		// type
-    "QuoteRequest",		// name
+    &fix40Spec, // version
+    82, // tid
+    "R", // type
+    "QuoteRequest", // name
     {0,0,0,0,0,0,0,0,1,2,31,0,0,0,0,0,0,0,0,0,0,0,23,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,28,0,0,0,0,15,0,0,0,0,22,4,11,0,17,0,27,20,5,12,0,0,0,0,0,0,0,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,30,8,9,0,29,0,0,0,16,0,0,0,0,0,0,0,0,24,25,0,0,0,0,0,0,0,6,13,0,0,0,0,0,18,0,0,0,0,0,7,14,0,19,0,0,0,0,0,0,0,0,26,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    QuoteRequestGroups,	// groups
+    QuoteRequestGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 131, true },	// QuoteReqID
-	{ 55, true },	// Symbol
-	{ 65, false },	// SymbolSfx
-	{ 48, false },	// SecurityID
-	{ 22, false },	// IDSource
-	{ 106, false },	// Issuer
-	{ 107, false },	// SecurityDesc
-	{ 140, false },	// PrevClosePx
-	{ 54, false },	// Side
-	{ 38, false },	// OrderQty
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 131, true }, // QuoteReqID
+	{ 55, true }, // Symbol
+	{ 65, false }, // SymbolSfx
+	{ 48, false }, // SecurityID
+	{ 22, false }, // IDSource
+	{ 106, false }, // Issuer
+	{ 107, false }, // SecurityDesc
+	{ 140, false }, // PrevClosePx
+	{ 54, false }, // Side
+	{ 38, false }, // OrderQty
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
@@ -1591,60 +1590,61 @@ static ofixGroupSpec	QuoteGroups[] = {
 };
 
 static struct _ofixMsgSpec	Quote = {
-    &fix40Spec,		// version
-    83,			// tid
-    "S",		// type
-    "Quote",		// name
+    &fix40Spec, // version
+    83, // tid
+    "S", // type
+    "Quote", // name
     {0,0,0,0,0,0,0,0,1,2,34,0,0,0,0,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,0,0,0,0,10,3,0,0,0,0,0,0,0,15,0,0,0,0,23,4,11,0,17,0,0,21,5,12,0,0,0,0,31,0,0,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,8,9,0,32,0,0,0,16,0,0,0,0,0,0,0,0,25,26,0,0,0,0,0,0,0,6,13,20,0,0,0,0,18,0,0,0,0,0,7,14,0,19,27,28,29,30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    QuoteGroups,	// groups
+    QuoteGroups, // groups
     {
-	{ 8, true },	// BeginString
-	{ 9, true },	// BodyLength
-	{ 35, true },	// MsgType
-	{ 49, true },	// SenderCompID
-	{ 56, true },	// TargetCompID
-	{ 115, false },	// OnBehalfOfCompID
-	{ 128, false },	// DeliverToCompID
-	{ 90, false },	// SecureDataLen
-	{ 91, false },	// SecureData
-	{ 34, true },	// MsgSeqNum
-	{ 50, false },	// SenderSubID
-	{ 57, false },	// TargetSubID
-	{ 116, false },	// OnBehalfOfSubID
-	{ 129, false },	// DeliverToSubID
-	{ 43, false },	// PossDupFlag
-	{ 97, false },	// PossResend
-	{ 52, true },	// SendingTime
-	{ 122, false },	// OrigSendingTime
-	{ 131, false },	// QuoteReqID
-	{ 117, true },	// QuoteID
-	{ 55, true },	// Symbol
-	{ 65, false },	// SymbolSfx
-	{ 48, false },	// SecurityID
-	{ 22, false },	// IDSource
-	{ 106, false },	// Issuer
-	{ 107, false },	// SecurityDesc
-	{ 132, true },	// BidPx
-	{ 133, false },	// OfferPx
-	{ 134, false },	// BidSize
-	{ 135, false },	// OfferSize
-	{ 62, false },	// ValidUntilTime
-	{ 93, false },	// SignatureLength
-	{ 89, false },	// Signature
-	{ 10, true },	// CheckSum
+	{ 8, true }, // BeginString
+	{ 9, true }, // BodyLength
+	{ 35, true }, // MsgType
+	{ 49, true }, // SenderCompID
+	{ 56, true }, // TargetCompID
+	{ 115, false }, // OnBehalfOfCompID
+	{ 128, false }, // DeliverToCompID
+	{ 90, false }, // SecureDataLen
+	{ 91, false }, // SecureData
+	{ 34, true }, // MsgSeqNum
+	{ 50, false }, // SenderSubID
+	{ 57, false }, // TargetSubID
+	{ 116, false }, // OnBehalfOfSubID
+	{ 129, false }, // DeliverToSubID
+	{ 43, false }, // PossDupFlag
+	{ 97, false }, // PossResend
+	{ 52, true }, // SendingTime
+	{ 122, false }, // OrigSendingTime
+	{ 131, false }, // QuoteReqID
+	{ 117, true }, // QuoteID
+	{ 55, true }, // Symbol
+	{ 65, false }, // SymbolSfx
+	{ 48, false }, // SecurityID
+	{ 22, false }, // IDSource
+	{ 106, false }, // Issuer
+	{ 107, false }, // SecurityDesc
+	{ 132, true }, // BidPx
+	{ 133, false }, // OfferPx
+	{ 134, false }, // BidSize
+	{ 135, false }, // OfferSize
+	{ 62, false }, // ValidUntilTime
+	{ 93, false }, // SignatureLength
+	{ 89, false }, // Signature
+	{ 10, true }, // CheckSum
 	{ 0, false }
     }
 };
 
 
-/***** Version *****/
+
+// FIX Version 4.0
 struct _ofixVersionSpec	fix40Spec = {
-    4,		// majorVersion
-    0,		// minorVersion
-    "FIX.4.0",// id
-    false,	// ready
-    tags,	// tags
-    { 0 },	// tagTable
+    4, // majorVersion
+    0, // minorVersion
+    "FIX.4.0", // id
+    false, // ready
+    tags, // tags
+    { 0 }, // tagTable
     {
 	&Heartbeat,
 	&TestRequest,

@@ -1,4 +1,5 @@
 # encoding: UTF-8
+# Copyright 2015 by Peter Ohler, All Rights Reserved
 
 require 'enum'
 

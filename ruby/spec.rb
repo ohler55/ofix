@@ -1,4 +1,5 @@
 # encoding: UTF-8
+# Copyright 2015 by Peter Ohler, All Rights Reserved
 
 require 'field'
 require 'comp'
@@ -31,8 +32,21 @@ class Spec
       set_member_where(m, 'Trailer')
     }
     load_messages(doc.locate('messages')[0])
+    @comps.each_value { |msg| tag_members(msg.members) }
 
-    # TBD expand message
+    @msgs.each_value { |msg| msg.expand_components(self) }
+
+    @msgs.each_value { |msg| tag_members(msg.members) }
+  end
+
+  def tag_members(ma)
+    ma.each { |m|
+      unless m.name.nil?
+        f = find_field(m.name)
+        m.tag = f.tag unless f.nil?
+      end
+      tag_members(m.members) unless m.members.empty?
+    }
   end
 
   def set_member_where(m, where)
@@ -66,9 +80,10 @@ class Spec
   end
 
   def load_components(xe)
+    return if xe.nil?
     xe.nodes.each { |n|
       next unless 'component' == n.name
-      c = Comp.new(n, self)
+      c = Comp.new(n)
       @comps[c.name] = c
     }
   end
@@ -115,9 +130,26 @@ static struct _ofixTagSpec	tags[] = {
     @msgs.values.sort_by { |m| m.type }.each { |m|
       m.gen_c(f, self)
     }
+    f.write(%|
 
-    # TBD spec struct
-
+// FIX Version #{@major}.#{@minor}
+struct _ofixVersionSpec	fix#{@major}#{@minor}Spec = {
+    #{@major}, // majorVersion
+    #{@minor}, // minorVersion
+    "FIX.#{@major}.#{@minor}", // id
+    false, // ready
+    tags, // tags
+    { 0 }, // tagTable
+    {
+|)
+    
+    @msgs.values.sort_by { |m| m.type }.each { |m|
+      f.write("\t&#{m.name},\n")
+    }    
+    f.write(%|\t0
+    }
+};
+|)
   end
 
 end # Spec

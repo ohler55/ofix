@@ -1,12 +1,14 @@
 # encoding: UTF-8
+# Copyright 2015 by Peter Ohler, All Rights Reserved
 
 require 'member'
 
 class Comp
 
   attr_reader :name
+  attr_reader :members
 
-  def initialize(xe, spec)
+  def initialize(xe)
     @name = xe.attributes['name']
     @members = []
     xe.nodes.each { |n|
