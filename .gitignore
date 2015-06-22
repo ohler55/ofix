@@ -34,3 +34,4 @@
 include
 lib
 test/run_tests
+*~

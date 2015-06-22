@@ -24,8 +24,14 @@ typedef enum {
     OFIX_ARG_ERR	= 'a',
     /** not found */
     OFIX_NOT_FOUND_ERR	= 'f',
+    /** read error */
+    OFIX_READ_ERR	= 'r',
     /** denied */
     OFIX_DENIED_ERR	= 'd',
+    /** network error */
+    OFIX_NETWORK_ERR	= 'n',
+    /** thread error */
+    OFIX_THREAD_ERR	= 't',
 } ofixErrCode;
 
 /**

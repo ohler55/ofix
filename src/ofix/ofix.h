@@ -10,6 +10,8 @@
 
 #include "msg.h"
 #include "tag.h"
+#include "engine.h"
+#include "session.h"
 #include "versionspec.h"
 
 #endif /* __OFIX_H__ */

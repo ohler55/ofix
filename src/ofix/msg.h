@@ -86,7 +86,7 @@ extern int	ofix_msg_size(ofixErr err, ofixMsg msg);
 
 /**
  * Returns the expected size of the FIX message string that would be generated
- * by tthe provided msg argument.
+ * by the provided msg argument.
  *
  * @param err pointer to error struct or NULL
  * @param msg the ofixMsg to operate on or NULL if the message is not complete
