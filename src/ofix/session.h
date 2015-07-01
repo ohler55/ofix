@@ -63,4 +63,7 @@ extern void	ofix_session_send(ofixErr err, ofixSession session, ofixMsg msg);
  */
 extern ofixMsg	ofix_session_get_msg(ofixErr err, ofixSession session, int64_t seq_num);
 
+extern int64_t	ofix_session_send_seqnum(ofixSession session);
+extern int64_t	ofix_session_recv_seqnum(ofixSession session);
+
 #endif /* __OFIX_SESSION_H__ */

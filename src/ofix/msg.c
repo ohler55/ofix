@@ -1435,6 +1435,7 @@ ofix_msg_set_int(ofixErr err, ofixMsg msg, int tag, int32_t value) {
 	}
     }
     slide_fields(msg, f + 1, set_int(err, msg, f, value));
+    msg->changed = true;
 }
 
 static int
@@ -1543,6 +1544,7 @@ ofix_msg_set_str(ofixErr err, ofixMsg msg, int tag, const char *value) {
 	}
     }
     slide_fields(msg, f + 1, set_data(err, msg, f, value, strlen(value)));
+    msg->changed = true;
 }
 
 void
@@ -1570,6 +1572,7 @@ ofix_msg_set_data_only(ofixErr err, ofixMsg msg, int tag, const char *value, int
 	}
     }
     slide_fields(msg, f + 1, set_data(err, msg, f, value, len));
+    msg->changed = true;
 }
 
 void
@@ -1593,6 +1596,7 @@ ofix_msg_set_data(ofixErr err, ofixMsg msg, int tag, const char *value, int len)
     }
     ofix_msg_set_int(err, msg, len_tag, len);
     ofix_msg_set_data_only(err, msg, tag, value, len);
+    msg->changed = true;
 }
 
 static int
@@ -1662,6 +1666,7 @@ ofix_msg_set_float(ofixErr err, ofixMsg msg, int tag, double value, int fracDigi
 	}
     }
     slide_fields(msg, f + 1, set_float(err, msg, f, value, fracDigits));
+    msg->changed = true;
 }
 
 static int
@@ -1835,6 +1840,7 @@ ofix_msg_set_date(ofixErr err, ofixMsg msg, int tag, ofixDate value) {
 	}
     }
     slide_fields(msg, f + 1, set_date(err, msg, f, value));
+    msg->changed = true;
 }
 
 // TBD set repeating fields
@@ -1876,6 +1882,7 @@ ofix_msg_remove(ofixErr err, ofixMsg msg, int tag) {
     slide_fields(msg, f + 1, shift);
     memmove(f, f + 1, sizeof(struct _Field) * (msg->field_cnt - (f - msg->fields) - 1));
     msg->field_cnt--;
+    msg->changed = true;
 }
 
 int

@@ -5,11 +5,7 @@
 
 - engine
  - Session
-  - create func
-  - connect
-  - send
-   - set seq, sender, target, 
-  - EngSession send (or make common)
+  - recv thread
 
  - add log functions and context
   - function to set

@@ -7,9 +7,11 @@
 #include <pthread.h>
 
 #include "test.h"
+#include "ofix/dtime.h"
 #include "ofix/store.h"
 #include "ofix/engine.h"
 #include "ofix/role.h"
+#include "ofix/tag.h"
 
 static void*
 start_engine(void *arg) {
@@ -36,11 +38,13 @@ logon_test() {
     ofixEngine		server = ofix_engine_create(&err, "Server", 6161, NULL, "server_storage", 0);
     pthread_t		server_thread;
     ofixSession		client;
+    ofixEngSession	server_session;
     const char		*vmsg = "8=FIX.4.4^9=113^35=D^49=Client^56=Server^34=4^52=20071031-17:42:33.123^11=order-4^21=1^55=IBM^54=2^60=20071031-17:42:11.321^40=7^10=206^";
     const char		*c = vmsg;
     char		buf[256];
     char		*b = buf;
     ofixMsg		msg;
+    double		giveup;
 
     if (OFIX_OK != err.code || NULL == server) {
 	test_print("Failed to create server [%d] %s\n", err.code, err.msg);
@@ -62,9 +66,27 @@ logon_test() {
 	test_fail();
 	return;
     }
-    // TBD func to wait for server to be ready
-    sleep(1);
+    // wait for engine to start
+    giveup = dtime() + 1.0;
+    while (!ofix_engine_running(server)) {
+	if (giveup < dtime()) {
+	    test_print("Timed out waiting for engine to start.\n");
+	    test_fail();
+	    return;
+	}
+    }
+
     ofix_session_connect(&err, client, "localhost", 6161);
+
+    sleep(1);
+    // TBD wait for logon to complete, client recv seqnum of 1
+
+    server_session = ofix_engine_get_session(&err, server, "Client");
+    if (OFIX_OK != err.code || NULL == server_session) {
+	test_print("Failed to find server session [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
     for (; '\0' != *c; c++, b++) {
 	if ('^' == *c) {
 	    *b = '\1';
@@ -78,9 +100,17 @@ logon_test() {
     ofix_session_send(&err, client, msg);
     ofix_session_send(&err, client, msg);
     ofix_session_send(&err, client, msg);
-    // TBD wait for logon to complete, maybe when connect completes?
 
-    sleep(4);
+    // wait for exchanges to complete
+    giveup = dtime() + 1.0;
+    // TBD change to client side
+    while (4 > ofix_engine_recv_seqnum(server_session)) {
+	if (giveup < dtime()) {
+	    test_print("Timed out waiting for client to receive responses.\n");
+	    test_fail();
+	    return;
+	}
+    }
 
     ofix_session_destroy(&err, client);
     ofix_engine_destroy(&err, server);

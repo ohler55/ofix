@@ -65,11 +65,18 @@ extern void		ofix_engine_start(ofixErr err, ofixEngine eng);
  */
 extern ofixEngSession	ofix_engine_get_session(ofixErr err, ofixEngine eng, const char *cid);
 
+extern void		ofix_engine_send(ofixErr err, ofixEngSession session, ofixMsg msg);
+
+extern bool		ofix_engine_running(ofixEngine eng);
+
 /**
  *
  *
  * @param err pointer to error struct or NULL
  */
 extern void		ofix_engine_destroy(ofixErr err, ofixEngine eng);
+
+extern int64_t		ofix_engine_send_seqnum(ofixEngSession session);
+extern int64_t		ofix_engine_recv_seqnum(ofixEngSession session);
 
 #endif /* __OFIX_ENGINE_H__ */
