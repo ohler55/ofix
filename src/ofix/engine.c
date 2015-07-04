@@ -147,6 +147,7 @@ handle_session_msg(ofixErr err, ofixEngSession session, const char *mt, ofixMsg 
     case '3': // Reject
     case '4': // SequenceReset
     case '5': // Logout
+	return false;
     case 'A': // Logon
 	if (ofix_msg_tag_exists(msg, OFIX_HeartBtIntTAG)) {
 	    session->heartbeat_interval = ofix_msg_get_int(err, msg, OFIX_HeartBtIntTAG);

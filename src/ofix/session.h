@@ -25,7 +25,7 @@ typedef struct _ofixSession	*ofixSession;
 /**
  * This type is used for receiving message callbacks.
  */
-typedef void	(*ofixRecvCallback)(ofixMsg msg, void *ctx);
+typedef bool	(*ofixRecvCallback)(ofixSession session, ofixMsg msg, void *ctx);
 
 extern ofixSession	ofix_session_create(ofixErr err,
 					    const char *cid,

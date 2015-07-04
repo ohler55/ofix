@@ -27,7 +27,17 @@ server_cb(ofixEngSession session, ofixMsg msg, void *ctx) {
     struct _ofixErr	err = OFIX_ERR_INIT;
     char		*s = ofix_msg_to_str(&err, msg);
 
-    printf("*** message callback: %s\n", s);
+    printf("*** server callback: %s\n", s);
+    free(s);
+    return true;
+}
+
+static bool
+client_cb(ofixSession session, ofixMsg msg, void *ctx) {
+    struct _ofixErr	err = OFIX_ERR_INIT;
+    char		*s = ofix_msg_to_str(&err, msg);
+
+    printf("*** client callback: %s\n", s);
     free(s);
     return true;
 }
@@ -60,7 +70,7 @@ logon_test() {
 	return;
     }
 
-    client = ofix_session_create(&err, "Client", "Server", "client_storage", NULL, NULL);
+    client = ofix_session_create(&err, "Client", "Server", "client_storage", client_cb, NULL);
     if (OFIX_OK != err.code || NULL == client) {
 	test_print("Failed to create client [%d] %s\n", err.code, err.msg);
 	test_fail();
@@ -79,6 +89,7 @@ logon_test() {
     ofix_session_connect(&err, client, "localhost", 6161);
 
     sleep(1);
+    printf("*** after connect\n");
     // TBD wait for logon to complete, client recv seqnum of 1
 
     server_session = ofix_engine_get_session(&err, server, "Client");
