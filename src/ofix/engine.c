@@ -19,21 +19,13 @@
 #include "store.h"
 #include "session.h"
 #include "tag.h"
+#include "private.h"
 
-struct _ofixEngSession {
-    struct _ofixEngSession	*next;
+typedef struct _EngSession {
+    struct _EngSession	*next;
     ofixEngine			engine;
-    char			*id;
-    int64_t			seqnum; // last seqnum
-    int64_t			last_cseq; // last client seqnum
-    Store			store;
-    int				sock;
-    int				heartbeat_interval;
-    bool			done;
-    bool			closed;
-    pthread_t			thread;
-    pthread_mutex_t		send_mutex;
-};
+    struct _ofixSession		session;
+} *EngSession;
 
 struct _ofixEngine {
     char		*id;
@@ -44,18 +36,18 @@ struct _ofixEngine {
     int 		heartbeat_interval;
     bool		done;
     bool		closed;
-    ofixEngSession	sessions;
+    EngSession	sessions;
     pthread_mutex_t	session_mutex;
-    ofixEngRecvCallback	recv_cb;
+    ofixRecvCallback	recv_cb;
     void		*recv_ctx;
 };
 
-static ofixEngSession
+static EngSession
 session_create(ofixErr err, struct _ofixEngine *eng, int sock) {
     if (NULL != err && OFIX_OK != err->code) {
 	return NULL;
     }
-    ofixEngSession	es = (ofixEngSession)malloc(sizeof(struct _ofixEngSession));
+    EngSession	es = (EngSession)malloc(sizeof(struct _EngSession));
 
     if (NULL == es) {
 	if (NULL != err) {
@@ -64,7 +56,7 @@ session_create(ofixErr err, struct _ofixEngine *eng, int sock) {
 	}
 	return NULL;
     }
-    if (0 != pthread_mutex_init(&es->send_mutex, 0)) {
+    if (0 != pthread_mutex_init(&es->session.send_mutex, 0)) {
 	if (NULL != err) {
 	    err->code = OFIX_MEMORY_ERR;
 	    strcpy(err->msg, "Failed to initialize mutex.");
@@ -73,24 +65,17 @@ session_create(ofixErr err, struct _ofixEngine *eng, int sock) {
 	return NULL;
     }
     es->engine = eng;
-    es->id = NULL;
-    es->store = NULL;
-    es->seqnum = 0;
-    es->sock = sock;
-    es->heartbeat_interval = 30;
-    es->last_cseq = 0;
-    es->done = false;
-    es->closed = true;
+    _ofix_session_init(err, &es->session, eng->id, NULL, NULL, eng->recv_cb, eng->recv_ctx);
+    es->session.sock = sock;
 
     return es;
 }
 
 static void
-session_destroy(ofixErr err, ofixEngSession session) {
+session_destroy(ofixErr err, EngSession session) {
     if (NULL != session) {
-	double		give_up = dtime() + 2.0;
-	ofixEngSession	es;
-	ofixEngSession	prev = NULL;
+	EngSession	es;
+	EngSession	prev = NULL;
 	ofixEngine	eng = session->engine;
 
 	pthread_mutex_lock(&eng->session_mutex);
@@ -107,23 +92,13 @@ session_destroy(ofixErr err, ofixEngSession session) {
 	}
 	pthread_mutex_unlock(&eng->session_mutex);
 
-	session->done = true;
-	while (dtime() < give_up && !session->closed) {
-	    dsleep(0.1);
-	}
-	if (0 < session->sock) {
-	    close(session->sock);
-	}
-	if (NULL != session->store) {
-	    ofix_store_destroy(session->store);
-	}
-	free(session->id);
+	_ofix_session_free(&session->session);
 	free(session);
     }
 }
 
 static void
-logon(ofixErr err, ofixEngSession session) {
+logon(ofixErr err, ofixSession session) {
     // TBD use version from client
     ofixMsg	msg = ofix_msg_create(err, "A", 4, 4, 14);
 
@@ -132,11 +107,11 @@ logon(ofixErr err, ofixEngSession session) {
     }
     ofix_msg_set_int(err, msg, OFIX_EncryptMethodTAG, 0); // not encrypted
     ofix_msg_set_int(err, msg, OFIX_HeartBtIntTAG, session->heartbeat_interval);
-    ofix_engine_send(err, session, msg);
+    ofix_session_send(err, session, msg);
 }
 
 static bool
-handle_session_msg(ofixErr err, ofixEngSession session, const char *mt, ofixMsg msg) {
+handle_session_msg(ofixErr err, EngSession session, const char *mt, ofixMsg msg) {
     if ('\0' != mt[1]) {
 	return false;
     }
@@ -150,9 +125,9 @@ handle_session_msg(ofixErr err, ofixEngSession session, const char *mt, ofixMsg 
 	return false;
     case 'A': // Logon
 	if (ofix_msg_tag_exists(msg, OFIX_HeartBtIntTAG)) {
-	    session->heartbeat_interval = ofix_msg_get_int(err, msg, OFIX_HeartBtIntTAG);
+	    session->session.heartbeat_interval = ofix_msg_get_int(err, msg, OFIX_HeartBtIntTAG);
 	}
-	logon(err, session);
+	logon(err, &session->session);
 	break;
     default:
 	return false;
@@ -162,7 +137,7 @@ handle_session_msg(ofixErr err, ofixEngSession session, const char *mt, ofixMsg 
 
 static void*
 session_loop(void *arg) {
-    ofixEngSession	session = (ofixEngSession)arg;
+    EngSession	session = (EngSession)arg;
     ofixEngine		eng = session->engine;
     char		buf[4096];
     char		*b = buf;
@@ -172,15 +147,15 @@ session_loop(void *arg) {
     fd_set		rfds;
     struct timeval	to;
     int			cnt;
-    int			sock = session->sock;
-    int			max_sock = session->sock + 1;
+    int			sock = session->session.sock;
+    int			max_sock = session->session.sock + 1;
     socklen_t		rlen = 0;
     ssize_t		rcnt;
     int			msg_len = 0;
 
-    session->done = false;
-    session->closed = false;
-    while (!session->done) {
+    session->session.done = false;
+    session->session.closed = false;
+    while (!session->session.done) {
 	while (start < b && isspace(*start)) {
 	    start++;
 	}
@@ -203,15 +178,16 @@ session_loop(void *arg) {
 	    FD_SET(sock, &xfds);
 	    if (0 < (cnt = select(max_sock, &rfds, 0, &xfds, &to))) {
 		if (FD_ISSET(sock, &xfds)) {
-		    session->done = true;
+		    session->session.done = true;
 		    break;
 		}
 		if (FD_ISSET(sock, &rfds)) {
 		    rlen = 0;
-		    rcnt = recvfrom(session->sock, b, end - b, 0, 0, &rlen);
+		    rcnt = recvfrom(sock, b, end - b, 0, 0, &rlen);
 		    b += rcnt;
 		}
 	    }
+	    // TBD handle errors
 	}
 	if (22 <= b - start && 0 == msg_len) {
 	    msg_len = ofix_msg_expected_buf_size(start);
@@ -234,47 +210,47 @@ session_loop(void *arg) {
 		bool		keep = false;
 		const char	*cid = ofix_msg_get_str(&err, msg, OFIX_SenderCompIDTAG);
 
-		if (NULL == session->id) {
+		if (NULL == session->session.tid) {
 		    char	path[1024];
 		    time_t	now = time(NULL);
 		    struct tm	*tm = gmtime(&now);
 
 		    if (NULL == cid) {
 			printf("*** Message did not contain a sender identifier. Closing session.\n");
-			session->done = true;
+			session->session.done = true;
 			break;
 		    }
-		    session->last_cseq = seq - 1;
-		    session->id = strdup(cid);
+		    session->session.recv_seq = seq - 1;
+		    session->session.tid = strdup(cid);
 		    snprintf(path, sizeof(path), "%s/%s-%04d%02d%02d.%02d%02d%02d",
-			     eng->store_dir, session->id,
+			     eng->store_dir, session->session.tid,
 			     tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
 			     tm->tm_hour, tm->tm_min, tm->tm_sec);
-		    session->store = ofix_store_create(&err, path, session->id);
+		    session->session.store = ofix_store_create(&err, path, session->session.tid);
 		}
-		ofix_store_add(&err, session->store, seq, OFIX_IODIR_RECV, msg);
+		ofix_store_add(&err, session->session.store, seq, OFIX_IODIR_RECV, msg);
 		if (NULL == mt) {
 		    printf("*** Invalid message. No MsgType field.\n");
-		} else if (NULL == cid || 0 != strcmp(session->id, cid)) {
-		    printf("*** Error: Expected sender of '%s'. Received '%s'.\n", session->id, (NULL == cid ? "<null>" : cid));
-		    session->last_cseq = seq;
-		} else if (session->last_cseq == seq) {
-		    printf("*** Warn: Duplicate message  from '%s'.\n", session->id);
+		} else if (NULL == cid || 0 != strcmp(session->session.tid, cid)) {
+		    printf("*** Error: Expected sender of '%s'. Received '%s'.\n", session->session.tid, (NULL == cid ? "<null>" : cid));
+		    session->session.recv_seq = seq;
+		} else if (session->session.recv_seq == seq) {
+		    printf("*** Warn: Duplicate message  from '%s'.\n", session->session.tid);
 		    // TBD check dup flag if the same
-		} else if (session->last_cseq + 1 != seq) {
-		    printf("*** Error: '%s' did not send the correct sequence number.\n", session->id);
+		} else if (session->session.recv_seq + 1 != seq) {
+		    printf("*** Error: '%s' did not send the correct sequence number.\n", session->session.tid);
 		} else if (handle_session_msg(&err, session, mt, msg)) {
 		    // TBD if seq is not the next then error, try to recover
-		    session->last_cseq = seq;
+		    session->session.recv_seq = seq;
 		} else if ('A' == *mt && '\0' == mt[1]) {
 		    if (ofix_msg_tag_exists(msg, OFIX_HeartBtIntTAG)) {
-			session->heartbeat_interval = ofix_msg_get_int(&err, msg, OFIX_HeartBtIntTAG);
+			session->session.heartbeat_interval = ofix_msg_get_int(&err, msg, OFIX_HeartBtIntTAG);
 		    }
-		    session->last_cseq = seq;
-		    logon(&err, session);
+		    session->session.recv_seq = seq;
+		    logon(&err, &session->session);
 		} else if (NULL != eng->recv_cb) {
-		    session->last_cseq = seq;
-		    keep = !eng->recv_cb(session, msg, eng->recv_ctx);
+		    session->session.recv_seq = seq;
+		    keep = !session->session.recv_cb(&session->session, msg, session->session.recv_ctx);
 		}
 		if (!keep) {
 		    ofix_msg_destroy(msg);
@@ -288,18 +264,18 @@ session_loop(void *arg) {
 	    }
 	}
     }
-    if (0 < session->sock) {
-	close(session->sock);
-	session->sock = 0;
+    if (0 < session->session.sock) {
+	close(session->session.sock);
+	session->session.sock = 0;
     }
-    session->closed = true;
+    session->session.closed = true;
 
     return NULL;
 }
 
 static void
-session_start(ofixErr err, ofixEngSession session) {
-    if (0 != pthread_create(&session->thread, 0, session_loop, session)) {
+session_start(ofixErr err, EngSession session) {
+    if (0 != pthread_create(&session->session.thread, 0, session_loop, session)) {
 	if (NULL != err) {
 	    err->code = OFIX_THREAD_ERR;
 	    strcpy(err->msg, "Failed to start session thread.");
@@ -377,8 +353,8 @@ ofix_engine_create(ofixErr err,
 void
 ofix_engine_destroy(ofixErr err, ofixEngine eng) {
     if (NULL != eng) {
-	ofixEngSession	sessions;
-	ofixEngSession	es;
+	EngSession	sessions;
+	EngSession	es;
 	double		give_up;
 
 	pthread_mutex_lock(&eng->session_mutex);
@@ -409,7 +385,7 @@ ofix_engine_running(ofixEngine eng) {
 }
 
 void
-ofix_engine_on_recv(ofixEngine eng, ofixEngRecvCallback cb, void *ctx) {
+ofix_engine_on_recv(ofixEngine eng, ofixRecvCallback cb, void *ctx) {
     eng->recv_cb = cb;
     eng->recv_ctx = ctx;
 }
@@ -493,7 +469,7 @@ ofix_engine_start(ofixErr err, ofixEngine eng) {
 	FD_SET(ssock, &xfds);
 	if (0 < (cnt = select(ssock + 1, &rfds, 0, &xfds, &to))) {
 	    if (FD_ISSET(ssock, &rfds)) {
-		ofixEngSession	session = NULL;
+		EngSession	session = NULL;
 
 		if (0 > (csock = accept(ssock, (struct sockaddr*)&client_addr, &addr_len))) {
 		    csock = 0;
@@ -539,66 +515,19 @@ ofix_engine_start(ofixErr err, ofixEngine eng) {
     eng->closed = true;
 }
 
-ofixEngSession
+ofixSession
 ofix_engine_get_session(ofixErr err, ofixEngine eng, const char *cid) {
-    ofixEngSession	es;
+    EngSession	es;
+    ofixSession	session = NULL;
 
     pthread_mutex_lock(&eng->session_mutex);
     for (es = eng->sessions; NULL != es; es = es->next) {
-	if (0 == strcmp(cid, es->id)) {
+	if (0 == strcmp(cid, es->session.tid)) {
+	    session = &es->session;
 	    break;
 	}
     }
     pthread_mutex_unlock(&eng->session_mutex);
 
-    return es;
-}
-
-void
-ofix_engine_send(ofixErr err, ofixEngSession session, ofixMsg msg) {
-    int			cnt;
-    const char		*str;
-    struct timeval	tv;
-    struct timezone	tz;
-    struct _ofixDate	now;
-
-    if (NULL != err && OFIX_OK != err->code) {
-	return;
-    }
-    gettimeofday(&tv, &tz);
-    ofix_date_set_timestamp(&now, (uint64_t)tv.tv_sec * 1000000LL + (uint64_t)tv.tv_usec);
-    ofix_msg_set_date(err, msg, OFIX_SendingTimeTAG, &now);
-    ofix_msg_set_str(err, msg, OFIX_SenderCompIDTAG, session->engine->id);
-    ofix_msg_set_str(err, msg, OFIX_TargetCompIDTAG, session->id);
-
-    pthread_mutex_lock(&session->send_mutex);
-    session->seqnum++;
-    ofix_msg_set_int(err, msg, OFIX_MsgSeqNumTAG, session->seqnum);
-    cnt = ofix_msg_size(err, msg);
-
-    // TBD temp, change to verbose
-    if (true) {
-	char	*s = ofix_msg_to_str(err, msg);
-	printf("*** engine sending %s\n", s);
-	free(s);
-    }
-    str = ofix_msg_FIX_str(err, msg);
-    if (cnt != send(session->sock, str, cnt, 0)) {
-	if (NULL != err) {
-	    err->code = OFIX_WRITE_ERR;
-	    snprintf(err->msg, sizeof(err->msg),
-		     "Failed to send message. error [%d] %s", errno, strerror(errno));
-	}
-    }
-    pthread_mutex_unlock(&session->send_mutex);
-}
-
-int64_t
-ofix_engine_send_seqnum(ofixEngSession session) {
-    return session->seqnum;
-}
-
-int64_t
-ofix_engine_recv_seqnum(ofixEngSession session) {
-    return session->last_cseq;
+    return session;
 }

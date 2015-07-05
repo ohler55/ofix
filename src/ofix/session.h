@@ -5,8 +5,8 @@
 
 #include <stdint.h>
 
+#include "err.h"
 #include "msg.h"
-#include "role.h"
 
 struct _ofixEngine;
 
@@ -26,26 +26,6 @@ typedef struct _ofixSession	*ofixSession;
  * This type is used for receiving message callbacks.
  */
 typedef bool	(*ofixRecvCallback)(ofixSession session, ofixMsg msg, void *ctx);
-
-extern ofixSession	ofix_session_create(ofixErr err,
-					    const char *cid,
-					    const char *sid,
-					    const char *store_path,
-					    ofixRecvCallback cb, void *ctx);
-
-/**
- *
- *
- * @param err pointer to error struct or NULL
- */
-extern void	ofix_session_destroy(ofixErr err, ofixSession session);
-
-/**
- *
- *
- * @param err pointer to error struct or NULL
- */
-extern void	ofix_session_connect(ofixErr err, ofixSession session, const char *host, int port);
 
 /**
  *

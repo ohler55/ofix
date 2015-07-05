@@ -4,9 +4,10 @@
 ^c^s show subtree
 
 - engine
- - test server callback sends response
-  - make messages order and new exec
- - use same session loop for session and eng session
+ - refactor
+  - Session is common, EngSession and ClientSession
+   - func to get session from each
+  - use same session loop for session and eng session
 
 
  - add log functions and context
