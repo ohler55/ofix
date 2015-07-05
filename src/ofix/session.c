@@ -43,6 +43,7 @@ _ofix_session_init(ofixErr err,
     s->recv_cb = cb;
     s->recv_ctx = ctx;
     s->heartbeat_interval = 30;
+    *s->store_dir = '\0';
     if (0 != pthread_mutex_init(&s->send_mutex, 0)) {
 	if (NULL != err) {
 	    err->code = OFIX_MEMORY_ERR;
@@ -51,7 +52,9 @@ _ofix_session_init(ofixErr err,
 	free(s);
 	return;
     }
-    if (NULL == (s->store = ofix_store_create(err, store_path, sid))) {
+    if (NULL == store_path) {
+	s->store = NULL;
+    } else if (NULL == (s->store = ofix_store_create(err, store_path, sid))) {
 	free(s);
 	return;
     }
@@ -63,6 +66,8 @@ _ofix_session_init(ofixErr err,
     }
     s->done = true;
     s->closed = true;
+    s->logon_sent = false;
+    s->logon_recv = false;
 }
 
 void
@@ -85,26 +90,38 @@ _ofix_session_free(ofixSession session) {
     free(session->tid);
 }
 
+static void
+handle_logon(ofixErr err, ofixSession session, ofixMsg msg) {
+    session->target_heartbeat_interval = (int)ofix_msg_get_int(err, msg, OFIX_HeartBtIntTAG);
+    if (!session->logon_sent) {
+	// TBD use FIX version from client and save for future messages
+	ofixMsg	reply = ofix_msg_create(err, "A", 4, 4, 14);
+
+	if (NULL == reply) {
+	    return;
+	}
+	ofix_msg_set_int(err, reply, OFIX_EncryptMethodTAG, 0); // not encrypted
+	ofix_msg_set_int(err, reply, OFIX_HeartBtIntTAG, session->heartbeat_interval);
+	ofix_session_send(err, session, reply);
+    }
+    session->logon_recv = true;
+}
+
 static bool
 handle_session_msg(ofixErr err, ofixSession session, const char *mt, ofixMsg msg) {
     if ('\0' != mt[1]) {
 	return false;
     }
     switch (*mt) {
+    case 'A': // Logon
+	handle_logon(err, session, msg);
+	break;
     case '0': // Heartbeat
     case '1': // TestRequest
     case '2': // ResendRequest
     case '3': // Reject
     case '4': // SequenceReset
     case '5': // Logout
-	return false;
-    case 'A': // Logon
-	printf("*** received logon\n");
-	if (ofix_msg_tag_exists(msg, OFIX_HeartBtIntTAG)) {
-	    session->heartbeat_interval = ofix_msg_get_int(err, msg, OFIX_HeartBtIntTAG);
-	}
-	//TBD logon(err, session);
-	break;
     default:
 	return false;
     }
@@ -191,6 +208,24 @@ session_loop(void *arg) {
 		bool		keep = false;
 		const char	*sid = ofix_msg_get_str(&err, msg, OFIX_SenderCompIDTAG);
 
+		if (NULL == session->store) {
+		    // Server just got it's first message on this session.
+		    char	path[1024];
+		    time_t	now = time(NULL);
+		    struct tm	*tm = gmtime(&now);
+
+		    if (NULL == sid) {
+			printf("*** Message did not contain a sender identifier. Closing session.\n");
+			session->done = true;
+			break;
+		    }
+		    session->tid = strdup(sid);
+		    snprintf(path, sizeof(path), "%s/%s-%04d%02d%02d.%02d%02d%02d.fix",
+			     session->store_dir, session->tid,
+			     tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
+			     tm->tm_hour, tm->tm_min, tm->tm_sec);
+		    session->store = ofix_store_create(&err, path, session->tid);
+		}
 		ofix_store_add(&err, session->store, seq, OFIX_IODIR_RECV, msg);
 		if (NULL == mt) {
 		    printf("*** Invalid message. No MsgType field.\n");
@@ -205,12 +240,6 @@ session_loop(void *arg) {
 		} else if (handle_session_msg(&err, session, mt, msg)) {
 		    // TBD if seq is not the next then error, try to recover
 		    session->recv_seq = seq;
-		} else if ('A' == *mt && '\0' == mt[1]) {
-		    if (ofix_msg_tag_exists(msg, OFIX_HeartBtIntTAG)) {
-			session->heartbeat_interval = ofix_msg_get_int(&err, msg, OFIX_HeartBtIntTAG);
-		    }
-		    session->recv_seq = seq;
-		    //TBD logon(&err, session);
 		} else if (NULL != session->recv_cb) {
 		    session->recv_seq = seq;
 		    keep = !session->recv_cb(session, msg, session->recv_ctx);
@@ -237,21 +266,22 @@ session_loop(void *arg) {
 }
 
 void
-_ofix_session_start(ofixErr err, ofixSession session) {
-    double	giveup;
-
+_ofix_session_start(ofixErr err, ofixSession session, bool wait) {
     if (0 != pthread_create(&session->thread, 0, session_loop, session)) {
 	if (NULL != err) {
 	    err->code = OFIX_THREAD_ERR;
 	    strcpy(err->msg, "Failed to start sessionthread.");
 	}
     }
-    giveup = dtime() + 2.0;
-    while (session->closed && session->done) {
-	if (giveup < dtime()) {
-	    err->code = OFIX_NETWORK_ERR;
-	    strcpy(err->msg, "Timed out waiting for session to start.");
-	    return;
+    if (wait) {
+	double	giveup = dtime() + 2.0;
+
+	while (session->closed && session->done) {
+	    if (giveup < dtime()) {
+		err->code = OFIX_NETWORK_ERR;
+		strcpy(err->msg, "Timed out waiting for session to start.");
+		return;
+	    }
 	}
     }
 }

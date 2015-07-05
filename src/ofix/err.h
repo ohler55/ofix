@@ -30,6 +30,8 @@ typedef enum {
     OFIX_DENIED_ERR	= 'd',
     /** network error */
     OFIX_NETWORK_ERR	= 'n',
+    /** logon error */
+    OFIX_LOGON_ERR	= 'l',
     /** thread error */
     OFIX_THREAD_ERR	= 't',
 } ofixErrCode;

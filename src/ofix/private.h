@@ -14,13 +14,17 @@ struct _ofixSession {
     char		*tid; // target ID
     int64_t		sent_seq; // last sent sequence number
     int64_t		recv_seq; // last recieved sequence number
+    char		store_dir[1024];
     Store		store;
     int			sock;
     ofixRecvCallback	recv_cb;
     void		*recv_ctx;
     int			heartbeat_interval;
+    int			target_heartbeat_interval;
     bool		done;
     bool		closed;
+    bool		logon_sent;
+    bool		logon_recv;
     pthread_t		thread;
     pthread_mutex_t	send_mutex;
 };
@@ -34,7 +38,7 @@ extern void	_ofix_session_init(ofixErr err,
 				   void *ctx);
 
 extern void	_ofix_session_free(ofixSession session);
-extern void	_ofix_session_start(ofixErr err, ofixSession session);
+extern void	_ofix_session_start(ofixErr err, ofixSession session, bool wait);
 
 extern uint32_t	_ofix_net_addr(ofixErr err, const char *host);
 

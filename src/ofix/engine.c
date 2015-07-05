@@ -67,6 +67,8 @@ session_create(ofixErr err, struct _ofixEngine *eng, int sock) {
     es->engine = eng;
     _ofix_session_init(err, &es->session, eng->id, NULL, NULL, eng->recv_cb, eng->recv_ctx);
     es->session.sock = sock;
+    strncpy(es->session.store_dir, eng->store_dir, sizeof(es->session.store_dir));
+    es->session.store_dir[sizeof(es->session.store_dir) - 1] = '\0';
 
     return es;
 }
@@ -94,192 +96,6 @@ session_destroy(ofixErr err, EngSession session) {
 
 	_ofix_session_free(&session->session);
 	free(session);
-    }
-}
-
-static void
-logon(ofixErr err, ofixSession session) {
-    // TBD use version from client
-    ofixMsg	msg = ofix_msg_create(err, "A", 4, 4, 14);
-
-    if (NULL == msg) {
-	return;
-    }
-    ofix_msg_set_int(err, msg, OFIX_EncryptMethodTAG, 0); // not encrypted
-    ofix_msg_set_int(err, msg, OFIX_HeartBtIntTAG, session->heartbeat_interval);
-    ofix_session_send(err, session, msg);
-}
-
-static bool
-handle_session_msg(ofixErr err, EngSession session, const char *mt, ofixMsg msg) {
-    if ('\0' != mt[1]) {
-	return false;
-    }
-    switch (*mt) {
-    case '0': // Heartbeat
-    case '1': // TestRequest
-    case '2': // ResendRequest
-    case '3': // Reject
-    case '4': // SequenceReset
-    case '5': // Logout
-	return false;
-    case 'A': // Logon
-	if (ofix_msg_tag_exists(msg, OFIX_HeartBtIntTAG)) {
-	    session->session.heartbeat_interval = ofix_msg_get_int(err, msg, OFIX_HeartBtIntTAG);
-	}
-	logon(err, &session->session);
-	break;
-    default:
-	return false;
-    }
-    return true;
-}
-
-static void*
-session_loop(void *arg) {
-    EngSession	session = (EngSession)arg;
-    ofixEngine		eng = session->engine;
-    char		buf[4096];
-    char		*b = buf;
-    char		*start = buf;
-    char		*end = buf + sizeof(buf);
-    fd_set		xfds;
-    fd_set		rfds;
-    struct timeval	to;
-    int			cnt;
-    int			sock = session->session.sock;
-    int			max_sock = session->session.sock + 1;
-    socklen_t		rlen = 0;
-    ssize_t		rcnt;
-    int			msg_len = 0;
-
-    session->session.done = false;
-    session->session.closed = false;
-    while (!session->session.done) {
-	while (start < b && isspace(*start)) {
-	    start++;
-	}
-	if (b - start < 22 || (0 < msg_len && b - start < msg_len)) {
-	    // Slide to make room before reading.
-	    if (buf < start) {
-		if (0 < b - start) {
-		    memmove(buf, start, b - start);
-		    b -= start - buf;
-		} else {
-		    b = buf;
-		}
-		start = buf;
-	    }
-	    to.tv_sec = 1;
-	    to.tv_usec = 0;
-	    FD_ZERO(&rfds);
-	    FD_ZERO(&xfds);
-	    FD_SET(sock, &rfds);
-	    FD_SET(sock, &xfds);
-	    if (0 < (cnt = select(max_sock, &rfds, 0, &xfds, &to))) {
-		if (FD_ISSET(sock, &xfds)) {
-		    session->session.done = true;
-		    break;
-		}
-		if (FD_ISSET(sock, &rfds)) {
-		    rlen = 0;
-		    rcnt = recvfrom(sock, b, end - b, 0, 0, &rlen);
-		    b += rcnt;
-		}
-	    }
-	    // TBD handle errors
-	}
-	if (22 <= b - start && 0 == msg_len) {
-	    msg_len = ofix_msg_expected_buf_size(start);
-	    if (0 == msg_len) {
-		*b = '\0';
-		printf("*** failed to parse message length, aborting '%s'\n", start);
-		break;
-	    }
-	    // TBD if msg_len is greater than buf then allocate,exit for now
-	}
-	if (0 < msg_len && msg_len <= b - start) {
-	    struct _ofixErr	err = OFIX_ERR_INIT;
-	    ofixMsg		msg = ofix_msg_parse(&err, start, msg_len);
-
-	    if (OFIX_OK != err.code) {
-		printf("*** parse error: %s\n", err.msg);
-	    } else {
-		int64_t		seq = ofix_msg_get_int(&err, msg, OFIX_MsgSeqNumTAG);
-		const char	*mt = ofix_msg_get_str(&err, msg, OFIX_MsgTypeTAG);
-		bool		keep = false;
-		const char	*cid = ofix_msg_get_str(&err, msg, OFIX_SenderCompIDTAG);
-
-		if (NULL == session->session.tid) {
-		    char	path[1024];
-		    time_t	now = time(NULL);
-		    struct tm	*tm = gmtime(&now);
-
-		    if (NULL == cid) {
-			printf("*** Message did not contain a sender identifier. Closing session.\n");
-			session->session.done = true;
-			break;
-		    }
-		    session->session.recv_seq = seq - 1;
-		    session->session.tid = strdup(cid);
-		    snprintf(path, sizeof(path), "%s/%s-%04d%02d%02d.%02d%02d%02d",
-			     eng->store_dir, session->session.tid,
-			     tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
-			     tm->tm_hour, tm->tm_min, tm->tm_sec);
-		    session->session.store = ofix_store_create(&err, path, session->session.tid);
-		}
-		ofix_store_add(&err, session->session.store, seq, OFIX_IODIR_RECV, msg);
-		if (NULL == mt) {
-		    printf("*** Invalid message. No MsgType field.\n");
-		} else if (NULL == cid || 0 != strcmp(session->session.tid, cid)) {
-		    printf("*** Error: Expected sender of '%s'. Received '%s'.\n", session->session.tid, (NULL == cid ? "<null>" : cid));
-		    session->session.recv_seq = seq;
-		} else if (session->session.recv_seq == seq) {
-		    printf("*** Warn: Duplicate message  from '%s'.\n", session->session.tid);
-		    // TBD check dup flag if the same
-		} else if (session->session.recv_seq + 1 != seq) {
-		    printf("*** Error: '%s' did not send the correct sequence number.\n", session->session.tid);
-		} else if (handle_session_msg(&err, session, mt, msg)) {
-		    // TBD if seq is not the next then error, try to recover
-		    session->session.recv_seq = seq;
-		} else if ('A' == *mt && '\0' == mt[1]) {
-		    if (ofix_msg_tag_exists(msg, OFIX_HeartBtIntTAG)) {
-			session->session.heartbeat_interval = ofix_msg_get_int(&err, msg, OFIX_HeartBtIntTAG);
-		    }
-		    session->session.recv_seq = seq;
-		    logon(&err, &session->session);
-		} else if (NULL != eng->recv_cb) {
-		    session->session.recv_seq = seq;
-		    keep = !session->session.recv_cb(&session->session, msg, session->session.recv_ctx);
-		}
-		if (!keep) {
-		    ofix_msg_destroy(msg);
-		}
-	    }
-	    start += msg_len;
-	    msg_len = 0;
-	    if (OFIX_OK != err.code) {
-		printf("*** Error: [%d] %s.\n", err.code, err.msg);
-		ofix_err_clear(&err);
-	    }
-	}
-    }
-    if (0 < session->session.sock) {
-	close(session->session.sock);
-	session->session.sock = 0;
-    }
-    session->session.closed = true;
-
-    return NULL;
-}
-
-static void
-session_start(ofixErr err, EngSession session) {
-    if (0 != pthread_create(&session->session.thread, 0, session_loop, session)) {
-	if (NULL != err) {
-	    err->code = OFIX_THREAD_ERR;
-	    strcpy(err->msg, "Failed to start session thread.");
-	}
     }
 }
 
@@ -496,7 +312,7 @@ ofix_engine_start(ofixErr err, ofixEngine eng) {
 		} else {
 		    session->next = eng->sessions;
 		    eng->sessions = session;
-		    session_start(err, session);
+		    _ofix_session_start(err, &session->session, false);
 		    if (NULL != err && OFIX_OK != err->code) {
 			printf("*** %s\n", err->msg);
 			close(csock);

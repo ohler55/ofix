@@ -88,12 +88,12 @@ logon(ofixErr err, ofixClient client) {
     if (NULL != client->password) {
 	ofix_msg_set_str(err, msg, OFIX_PasswordTAG, client->password);
     }
+    client->session.logon_sent = true;
     ofix_client_send(err, client, msg);
-    // TBD flag for when logon has succeeded or failed
 }
 
 void
-ofix_client_connect(ofixErr err, ofixClient client, const char *host, int port) {
+ofix_client_connect(ofixErr err, ofixClient client, const char *host, int port, double timeout) {
     struct sockaddr_in	sin;
     struct sockaddr_in	sout;
     uint32_t		addr = _ofix_net_addr(err, host);
@@ -140,9 +140,22 @@ ofix_client_connect(ofixErr err, ofixClient client, const char *host, int port) 
 	    serr = errno;
 	}
     }
-    _ofix_session_start(err, &client->session);
-    printf("*** client connected\n");
+    _ofix_session_start(err, &client->session, true);
+    if (NULL != err && OFIX_OK != err->code) {
+	return;
+    }
     logon(err, client);
+    if (0.0 < timeout) {
+	double	giveup = dtime() + timeout;
+
+	while (!client->session.logon_recv) {
+	    if (giveup < dtime()) {
+		err->code = OFIX_LOGON_ERR;
+		strcpy(err->msg, "Timed out waiting for logon to complete.");
+		return;
+	    }
+	}
+    }
 }
 
 void

@@ -40,7 +40,7 @@ extern void	ofix_client_destroy(ofixErr err, ofixClient client);
  *
  * @param err pointer to error struct or NULL
  */
-extern void	ofix_client_connect(ofixErr err, ofixClient client, const char *host, int port);
+extern void	ofix_client_connect(ofixErr err, ofixClient client, const char *host, int port, double timeout);
 
 /**
  *
