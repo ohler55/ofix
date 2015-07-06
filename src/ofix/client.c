@@ -29,11 +29,12 @@ struct _ofixClient {
 
 ofixClient
 ofix_client_create(ofixErr err,
-		    const char *cid,
-		    const char *sid,
-		    const char *store_path,
-		    ofixRecvCallback cb,
-		    void *ctx) {
+		   const char *cid,
+		   const char *sid,
+		   const char *store_path,
+		   ofixVersionSpec spec,
+		   ofixRecvCallback cb,
+		   void *ctx) {
     if (NULL != err && OFIX_OK != err->code) {
 	return NULL;
     }
@@ -54,7 +55,7 @@ ofix_client_create(ofixErr err,
 	return NULL;
     }
     
-    _ofix_session_init(err, &client->session, cid, sid, store_path, cb, ctx);
+    _ofix_session_init(err, &client->session, cid, sid, store_path, spec, cb, ctx);
 
     client->user = NULL;
     client->password = NULL;
@@ -176,4 +177,27 @@ ofix_client_send_seqnum(ofixClient client) {
 int64_t
 ofix_client_recv_seqnum(ofixClient client) {
     return client->session.recv_seq;
+}
+
+static bool
+log_on_false(ofixLogLevel level) {
+    return false;
+}
+
+static void
+log_noop(ofixLogLevel level, const char *format, ...) {
+}
+
+void
+ofix_client_set_log(ofixClient client, ofixLogOn log_on, ofixLog log) {
+    if (NULL == log_on) {
+	client->session.log_on = log_on_false;
+    } else {
+	client->session.log_on = log_on;
+    }
+    if (NULL == log) {
+	client->session.log = log_noop;
+    } else {
+	client->session.log = log;
+    }
 }

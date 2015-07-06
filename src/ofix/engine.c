@@ -14,6 +14,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "err.h"
 #include "engine.h"
 #include "dtime.h"
 #include "store.h"
@@ -23,8 +24,8 @@
 
 typedef struct _EngSession {
     struct _EngSession	*next;
-    ofixEngine			engine;
-    struct _ofixSession		session;
+    ofixEngine		engine;
+    struct _ofixSession	session;
 } *EngSession;
 
 struct _ofixEngine {
@@ -32,15 +33,34 @@ struct _ofixEngine {
     char		*ipaddr;
     int			port;
     char		*auth_file;
+    ofixVersionSpec	spec;
     char 		*store_dir;
     int 		heartbeat_interval;
     bool		done;
     bool		closed;
-    EngSession	sessions;
+    EngSession		sessions;
     pthread_mutex_t	session_mutex;
     ofixRecvCallback	recv_cb;
     void		*recv_ctx;
+    ofixLogOn		log_on;
+    ofixLog		log;
 };
+
+static bool
+log_on(ofixLogLevel level) {
+    return (level <= OFIX_INFO);
+}
+
+static void
+log(ofixLogLevel level, const char *format, ...) {
+    if (level <= OFIX_INFO) {
+	va_list	ap;
+
+	va_start(ap, format);
+	vprintf(format, ap);
+	va_end(ap);
+    }
+}
 
 static EngSession
 session_create(ofixErr err, struct _ofixEngine *eng, int sock) {
@@ -65,8 +85,11 @@ session_create(ofixErr err, struct _ofixEngine *eng, int sock) {
 	return NULL;
     }
     es->engine = eng;
-    _ofix_session_init(err, &es->session, eng->id, NULL, NULL, eng->recv_cb, eng->recv_ctx);
+    _ofix_session_init(err, &es->session, eng->id, NULL, NULL, eng->spec, eng->recv_cb, eng->recv_ctx);
     es->session.sock = sock;
+    es->session.spec = eng->spec;
+    es->session.log_on = eng->log_on;
+    es->session.log = eng->log;
     strncpy(es->session.store_dir, eng->store_dir, sizeof(es->session.store_dir));
     es->session.store_dir[sizeof(es->session.store_dir) - 1] = '\0';
 
@@ -105,6 +128,7 @@ ofix_engine_create(ofixErr err,
 		   int port,
 		   const char *auth_file,
 		   const char *store_dir,
+		   ofixVersionSpec spec,
 		   int heartbeat_interval) {
     if (NULL != err && OFIX_OK != err->code) {
 	return NULL;
@@ -140,6 +164,9 @@ ofix_engine_create(ofixErr err,
     eng->closed = true;
     eng->ipaddr = NULL;
     eng->port = port;
+    eng->spec = spec;
+    eng->log_on = log_on;
+    eng->log = log;
     if (NULL == auth_file) {
 	eng->auth_file = NULL;
     } else {
@@ -346,4 +373,27 @@ ofix_engine_get_session(ofixErr err, ofixEngine eng, const char *cid) {
     pthread_mutex_unlock(&eng->session_mutex);
 
     return session;
+}
+
+static bool
+log_on_false(ofixLogLevel level) {
+    return false;
+}
+
+static void
+log_noop(ofixLogLevel level, const char *format, ...) {
+}
+
+void
+ofix_engine_set_log(ofixEngine eng, ofixLogOn log_on, ofixLog log) {
+    if (NULL == log_on) {
+	eng->log_on = log_on_false;
+    } else {
+	eng->log_on = log_on;
+    }
+    if (NULL == log) {
+	eng->log = log_noop;
+    } else {
+	eng->log = log;
+    }
 }

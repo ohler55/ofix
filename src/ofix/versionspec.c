@@ -7,6 +7,7 @@
 #include "versionspec.h"
 
 extern ofixVersionSpec	ofix_get_spec(ofixErr err, int major, int minor);
+
 static ofixTagSpec	create_dummy_tag_spec(int tag);
 
 static ofixTagSpec	*unknown_tags = 0;

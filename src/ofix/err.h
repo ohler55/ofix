@@ -3,6 +3,9 @@
 #ifndef __OFIX_ERR_H__
 #define __OFIX_ERR_H__
 
+#include <stdbool.h>
+#include <stdarg.h>
+
 #define OFIX_ERR_INIT	{ 0, { 0 } }
 
 /**
@@ -36,6 +39,17 @@ typedef enum {
     OFIX_THREAD_ERR	= 't',
 } ofixErrCode;
 
+typedef enum {
+    /** Error level */
+    OFIX_ERROR	= 0,
+    /** Warn level */
+    OFIX_WARN	= 1,
+    /** Info level */
+    OFIX_INFO	= 2,
+    /** Info level */
+    OFIX_DEBUG	= 3,
+} ofixLogLevel;
+
 /**
  * The struct used to report errors or status after a function returns. The
  * struct must be initialized before use as most calls that take an err argument
@@ -54,5 +68,8 @@ static inline void ofix_err_clear(ofixErr err) {
     err->code = OFIX_OK;
     *err->msg = '\0';
 }
+
+typedef bool	(*ofixLogOn)(ofixLogLevel level);
+typedef void	(*ofixLog)(ofixLogLevel level, const char *format, ...);
 
 #endif /* __OFIX_ERR_H__ */

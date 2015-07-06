@@ -33,6 +33,7 @@ extern ofixEngine	ofix_engine_create(ofixErr err,
 					   int port,
 					   const char *auth_file,
 					   const char *store_dir,
+					   ofixVersionSpec spec,
 					   int heartbeat_interval);
 
 extern void		ofix_engine_on_recv(ofixEngine eng, ofixRecvCallback cb, void *ctx);

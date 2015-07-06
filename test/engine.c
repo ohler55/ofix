@@ -19,6 +19,8 @@
 #include "ofix/tag.h"
 #include "ofix/versionspec.h"
 
+extern ofixVersionSpec	ofix_get_spec(ofixErr err, int major, int minor);
+
 static int	xid_cnt = 0;
 
 static void
@@ -124,7 +126,8 @@ static void
 normal_test() {
     struct _ofixErr	err = OFIX_ERR_INIT;
     const char		*client_storage = "client_storage.fix";
-    ofixEngine		server = ofix_engine_create(&err, "Server", 6161, NULL, "server_storage", 0);
+    ofixVersionSpec	vspec = ofix_get_spec(&err, 4, 4);
+    ofixEngine		server = ofix_engine_create(&err, "Server", 6161, NULL, "server_storage", vspec, 0);
     pthread_t		server_thread;
     ofixClient		client;
     ofixSession		server_session;
@@ -152,7 +155,7 @@ normal_test() {
 	return;
     }
 
-    client = ofix_client_create(&err, "Client", "Server", client_storage, client_cb, NULL);
+    client = ofix_client_create(&err, "Client", "Server", client_storage, vspec, client_cb, NULL);
     if (OFIX_OK != err.code || NULL == client) {
 	test_print("Failed to create client [%d] %s\n", err.code, err.msg);
 	test_fail();

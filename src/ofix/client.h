@@ -5,8 +5,10 @@
 
 #include <stdint.h>
 
+#include "err.h"
 #include "msg.h"
 #include "role.h"
+#include "versionspec.h"
 
 struct _ofixEngine;
 
@@ -23,10 +25,11 @@ struct _ofixEngine;
 typedef struct _ofixClient	*ofixClient;
 
 extern ofixClient	ofix_client_create(ofixErr err,
-					    const char *cid,
-					    const char *sid,
-					    const char *store_path,
-					    ofixRecvCallback cb, void *ctx);
+					   const char *cid,
+					   const char *sid,
+					   const char *store_path,
+					   ofixVersionSpec spec,
+					   ofixRecvCallback cb, void *ctx);
 
 /**
  *
@@ -60,5 +63,7 @@ extern ofixMsg	ofix_client_get_msg(ofixErr err, ofixClient client, int64_t seq_n
 
 extern int64_t	ofix_client_send_seqnum(ofixClient client);
 extern int64_t	ofix_client_recv_seqnum(ofixClient client);
+
+extern void	ofix_client_set_log(ofixClient client, ofixLogOn log_on, ofixLog log);
 
 #endif /* __OFIX_CLIENT_H__ */

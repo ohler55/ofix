@@ -17,7 +17,24 @@
 #include "engine.h"
 #include "store.h"
 #include "tag.h"
+#include "versionspec.h"
 #include "private.h"
+
+static bool
+log_on(ofixLogLevel level) {
+    return (level <= OFIX_INFO);
+}
+
+static void
+log(ofixLogLevel level, const char *format, ...) {
+    if (level <= OFIX_INFO) {
+	va_list	ap;
+
+	va_start(ap, format);
+	vprintf(format, ap);
+	va_end(ap);
+    }
+}
 
 void
 _ofix_session_init(ofixErr err,
@@ -25,6 +42,7 @@ _ofix_session_init(ofixErr err,
 		   const char *sid,
 		   const char *tid,
 		   const char *store_path,
+		   ofixVersionSpec spec,
 		   ofixRecvCallback cb,
 		   void *ctx) {
     if (NULL != err && OFIX_OK != err->code) {
@@ -37,6 +55,7 @@ _ofix_session_init(ofixErr err,
 	}
 	return;
     }
+    s->spec = spec;
     s->sent_seq = 0;
     s->recv_seq = 0;
     s->sock = 0;
@@ -44,6 +63,9 @@ _ofix_session_init(ofixErr err,
     s->recv_ctx = ctx;
     s->heartbeat_interval = 30;
     *s->store_dir = '\0';
+    s->log_on = log_on;
+    s->log = log;
+
     if (0 != pthread_mutex_init(&s->send_mutex, 0)) {
 	if (NULL != err) {
 	    err->code = OFIX_MEMORY_ERR;
@@ -90,12 +112,21 @@ _ofix_session_free(ofixSession session) {
     free(session->tid);
 }
 
+ofixMsg
+ofix_session_create_msg(ofixErr err, ofixSession session, const char *type) {
+    ofixMsgSpec	mspec = ofix_version_spec_get_msg_spec_from_version(err, type, session->spec);
+
+    if (NULL == mspec) {
+	return NULL;
+    }
+    return ofix_msg_create_from_spec(err, mspec, 20);
+}
+
 static void
 handle_logon(ofixErr err, ofixSession session, ofixMsg msg) {
     session->target_heartbeat_interval = (int)ofix_msg_get_int(err, msg, OFIX_HeartBtIntTAG);
     if (!session->logon_sent) {
-	// TBD use FIX version from client and save for future messages
-	ofixMsg	reply = ofix_msg_create(err, "A", 4, 4, 14);
+	ofixMsg	reply = ofix_session_create_msg(err, session, "A");
 
 	if (NULL == reply) {
 	    return;

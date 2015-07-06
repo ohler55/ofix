@@ -37,7 +37,6 @@ struct _ofixMsg {
     bool		changed;
 };
 
-// Function provided by spec library.
 extern ofixVersionSpec	ofix_get_spec(ofixErr err, int major, int minor);
 
 static ofixMsg	alloc_msg(ofixErr err, int field_cnt);
