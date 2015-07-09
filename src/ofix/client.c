@@ -111,12 +111,9 @@ ofix_client_connect(ofixErr err, ofixClient client, const char *host, int port, 
     sout.sin_port = htons(port);
     sout.sin_addr.s_addr = htonl(addr);
     //sout.sin_addr.s_addr = htonl(sout.sin_addr.s_addr);
-    //printf("*** Connecting to %d.%d.%d.%d on port %d\n",
-    //addr >> 24, (addr >> 16) & 0xFF, (addr >> 8) & 0xFF, addr & 0xFF, port);
+    client->session.log(client->session.log_ctx, OFIX_INFO, "Connecting to %d.%d.%d.%d on port %d\n",
+			addr >> 24, (addr >> 16) & 0xFF, (addr >> 8) & 0xFF, addr & 0xFF, port);
     if (-1 == (client->session.sock = socket(AF_INET, SOCK_STREAM, 0))) {
-	printf("*** Failed to create socket to %d.%d.%d.%d on port %d, error [%d] %s\n",
-	       addr >> 24, (addr >> 16) & 0xFF, (addr >> 8) & 0xFF, addr & 0xFF, port,
-	       errno, strerror(errno));
 	if (NULL != err) {
 	    err->code = OFIX_NETWORK_ERR;
 	    snprintf(err->msg, sizeof(err->msg),
@@ -180,16 +177,16 @@ ofix_client_recv_seqnum(ofixClient client) {
 }
 
 static bool
-log_on_false(ofixLogLevel level) {
+log_on_false(void *ctx, ofixLogLevel level) {
     return false;
 }
 
 static void
-log_noop(ofixLogLevel level, const char *format, ...) {
+log_noop(void *ctx, ofixLogLevel level, const char *format, ...) {
 }
 
 void
-ofix_client_set_log(ofixClient client, ofixLogOn log_on, ofixLog log) {
+ofix_client_set_log(ofixClient client, ofixLogOn log_on, ofixLog log, void *ctx) {
     if (NULL == log_on) {
 	client->session.log_on = log_on_false;
     } else {
@@ -200,4 +197,5 @@ ofix_client_set_log(ofixClient client, ofixLogOn log_on, ofixLog log) {
     } else {
 	client->session.log = log;
     }
+    client->session.log_ctx = ctx;
 }

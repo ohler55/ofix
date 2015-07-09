@@ -69,7 +69,7 @@ static inline void ofix_err_clear(ofixErr err) {
     *err->msg = '\0';
 }
 
-typedef bool	(*ofixLogOn)(ofixLogLevel level);
-typedef void	(*ofixLog)(ofixLogLevel level, const char *format, ...);
+typedef bool	(*ofixLogOn)(void *ctx, ofixLogLevel level);
+typedef void	(*ofixLog)(void *ctx, ofixLogLevel level, const char *format, ...);
 
 #endif /* __OFIX_ERR_H__ */

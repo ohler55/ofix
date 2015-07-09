@@ -10,18 +10,34 @@
 #include <pthread.h>
 
 #include "test.h"
-#include "ofix/dtime.h"
-#include "ofix/store.h"
-#include "ofix/engine.h"
 #include "ofix/client.h"
+#include "ofix/dtime.h"
+#include "ofix/engine.h"
+#include "ofix/err.h"
 #include "ofix/msg.h"
 #include "ofix/role.h"
+#include "ofix/store.h"
 #include "ofix/tag.h"
 #include "ofix/versionspec.h"
 
 extern ofixVersionSpec	ofix_get_spec(ofixErr err, int major, int minor);
 
 static int	xid_cnt = 0;
+
+static bool
+log_on(void *ctx, ofixLogLevel level) {
+    return true;
+}
+
+static void
+log(void *ctx, ofixLogLevel level, const char *format, ...) {
+    va_list	ap;
+    
+    va_start(ap, format);
+    vfprintf((FILE*)ctx, format, ap);
+    fputc('\n', (FILE*)ctx);
+    va_end(ap);
+}
 
 static void
 log_same(const char *log, const char *expect) {
@@ -147,6 +163,8 @@ normal_test() {
 	return;
     }
     ofix_engine_on_recv(server, server_cb, NULL);
+    // TBD change to write to file
+    ofix_engine_set_log(server, log_on, log, stdout);
 
     // throw server into a separate thread
     if (0 != pthread_create(&server_thread, 0, start_engine, server)) {
@@ -161,6 +179,9 @@ normal_test() {
 	test_fail();
 	return;
     }
+    // TBD change to write to file
+    ofix_client_set_log(client, log_on, log, stdout);
+
     // wait for engine to start
     giveup = dtime() + 1.0;
     while (!ofix_engine_running(server)) {

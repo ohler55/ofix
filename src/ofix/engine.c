@@ -44,15 +44,16 @@ struct _ofixEngine {
     void		*recv_ctx;
     ofixLogOn		log_on;
     ofixLog		log;
+    void		*log_ctx;
 };
 
 static bool
-log_on(ofixLogLevel level) {
+log_on(void *ctx, ofixLogLevel level) {
     return (level <= OFIX_INFO);
 }
 
 static void
-log(ofixLogLevel level, const char *format, ...) {
+log(void *ctx, ofixLogLevel level, const char *format, ...) {
     if (level <= OFIX_INFO) {
 	va_list	ap;
 
@@ -90,6 +91,7 @@ session_create(ofixErr err, struct _ofixEngine *eng, int sock) {
     es->session.spec = eng->spec;
     es->session.log_on = eng->log_on;
     es->session.log = eng->log;
+    es->session.log_ctx = eng->log_ctx;
     strncpy(es->session.store_dir, eng->store_dir, sizeof(es->session.store_dir));
     es->session.store_dir[sizeof(es->session.store_dir) - 1] = '\0';
 
@@ -167,6 +169,7 @@ ofix_engine_create(ofixErr err,
     eng->spec = spec;
     eng->log_on = log_on;
     eng->log = log;
+    eng->log_ctx = NULL;
     if (NULL == auth_file) {
 	eng->auth_file = NULL;
     } else {
@@ -316,24 +319,23 @@ ofix_engine_start(ofixErr err, ofixEngine eng) {
 
 		if (0 > (csock = accept(ssock, (struct sockaddr*)&client_addr, &addr_len))) {
 		    csock = 0;
-		    // TBD handle better
-		    printf("*** Failed to accept a client connection.");
+		    eng->log(eng->log_ctx, OFIX_WARN, "Failed to accept a client connection.");
 		    continue;
 		}
 		getpeername(csock, (struct sockaddr*)&saddr, &addr_len);
 		saddr.sin_addr.s_addr = htonl(saddr.sin_addr.s_addr);
 
-		printf("*** connection established from %d.%d.%d.%d on socket %d\n",
-		       saddr.sin_addr.s_addr >> 24,
-		       (saddr.sin_addr.s_addr >> 16) & 0xFF,
-		       (saddr.sin_addr.s_addr >> 8) & 0xFF,
-		       saddr.sin_addr.s_addr & 0xFF,
-		       csock);
+		eng->log(eng->log_ctx, OFIX_INFO, "Connection established from %d.%d.%d.%d on socket %d",
+			 saddr.sin_addr.s_addr >> 24,
+			 (saddr.sin_addr.s_addr >> 16) & 0xFF,
+			 (saddr.sin_addr.s_addr >> 8) & 0xFF,
+			 saddr.sin_addr.s_addr & 0xFF,
+			 csock);
 
 		session = session_create(err, eng, csock);
 		if (NULL == session) {
 		    if (NULL != err) {
-			printf("*** %s\n", err->msg);
+			eng->log(eng->log_ctx, OFIX_WARN, "Failed to start session. %s", err->msg);
 		    }
 		    close(csock);
 		} else {
@@ -341,7 +343,7 @@ ofix_engine_start(ofixErr err, ofixEngine eng) {
 		    eng->sessions = session;
 		    _ofix_session_start(err, &session->session, false);
 		    if (NULL != err && OFIX_OK != err->code) {
-			printf("*** %s\n", err->msg);
+			eng->log(eng->log_ctx, OFIX_WARN, "Failed to start session. %s", err->msg);
 			close(csock);
 		    }
 		}
@@ -376,16 +378,16 @@ ofix_engine_get_session(ofixErr err, ofixEngine eng, const char *cid) {
 }
 
 static bool
-log_on_false(ofixLogLevel level) {
+log_on_false(void *ctx, ofixLogLevel level) {
     return false;
 }
 
 static void
-log_noop(ofixLogLevel level, const char *format, ...) {
+log_noop(void *ctx, ofixLogLevel level, const char *format, ...) {
 }
 
 void
-ofix_engine_set_log(ofixEngine eng, ofixLogOn log_on, ofixLog log) {
+ofix_engine_set_log(ofixEngine eng, ofixLogOn log_on, ofixLog log, void *ctx) {
     if (NULL == log_on) {
 	eng->log_on = log_on_false;
     } else {
@@ -396,4 +398,5 @@ ofix_engine_set_log(ofixEngine eng, ofixLogOn log_on, ofixLog log) {
     } else {
 	eng->log = log;
     }
+    eng->log_ctx = ctx;
 }

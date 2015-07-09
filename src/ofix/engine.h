@@ -69,4 +69,6 @@ extern bool		ofix_engine_running(ofixEngine eng);
  */
 extern void		ofix_engine_destroy(ofixErr err, ofixEngine eng);
 
+extern void		ofix_engine_set_log(ofixEngine eng, ofixLogOn log_on, ofixLog log, void *ctx);
+
 #endif /* __OFIX_ENGINE_H__ */

@@ -8,6 +8,7 @@
 #include "err.h"
 #include "msg.h"
 #include "role.h"
+#include "session.h"
 #include "versionspec.h"
 
 struct _ofixEngine;
@@ -64,6 +65,6 @@ extern ofixMsg	ofix_client_get_msg(ofixErr err, ofixClient client, int64_t seq_n
 extern int64_t	ofix_client_send_seqnum(ofixClient client);
 extern int64_t	ofix_client_recv_seqnum(ofixClient client);
 
-extern void	ofix_client_set_log(ofixClient client, ofixLogOn log_on, ofixLog log);
+extern void	ofix_client_set_log(ofixClient client, ofixLogOn log_on, ofixLog log, void *ctx);
 
 #endif /* __OFIX_CLIENT_H__ */

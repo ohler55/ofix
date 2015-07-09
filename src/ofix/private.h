@@ -31,6 +31,7 @@ struct _ofixSession {
     pthread_mutex_t	send_mutex;
     ofixLogOn		log_on;
     ofixLog		log;
+    void		*log_ctx;
 };
 
 extern void	_ofix_session_init(ofixErr err,

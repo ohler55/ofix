@@ -21,12 +21,12 @@
 #include "private.h"
 
 static bool
-log_on(ofixLogLevel level) {
+log_on(void *ctx, ofixLogLevel level) {
     return (level <= OFIX_INFO);
 }
 
 static void
-log(ofixLogLevel level, const char *format, ...) {
+log(void *ctx, ofixLogLevel level, const char *format, ...) {
     if (level <= OFIX_INFO) {
 	va_list	ap;
 
@@ -125,6 +125,10 @@ ofix_session_create_msg(ofixErr err, ofixSession session, const char *type) {
 static void
 handle_logon(ofixErr err, ofixSession session, ofixMsg msg) {
     session->target_heartbeat_interval = (int)ofix_msg_get_int(err, msg, OFIX_HeartBtIntTAG);
+    // TBD check spec version and logout if not the same or adapt later
+    // TBD if encrypt does not match send logout
+    // TBD validate sender and user/password and logout it not accepted
+    // TBD verify sequence number (if there is some predefined start number)
     if (!session->logon_sent) {
 	ofixMsg	reply = ofix_session_create_msg(err, session, "A");
 
@@ -213,7 +217,7 @@ session_loop(void *arg) {
 		continue;
 	    } else {
 		// TBD if after logout then no error
-		printf("*** select error %d - %s\n", errno, strerror(errno));
+		session->log(session->log_ctx, OFIX_WARN, "select error %d - %s", errno, strerror(errno));
 		session->done = true;
 		break;
 	    }
@@ -222,7 +226,8 @@ session_loop(void *arg) {
 	    msg_len = ofix_msg_expected_buf_size(start);
 	    if (0 == msg_len) {
 		*b = '\0';
-		printf("*** failed to parse message length, aborting '%s'\n", start);
+		session->log(session->log_ctx, OFIX_WARN,
+			     "Failed to parse message length, aborting '%s'", start);
 		break;
 	    }
 	    // TBD if msg_len is greater than buf then allocate,exit for now
@@ -232,7 +237,7 @@ session_loop(void *arg) {
 	    ofixMsg		msg = ofix_msg_parse(&err, start, msg_len);
 
 	    if (OFIX_OK != err.code) {
-		printf("*** parse error: %s\n", err.msg);
+		session->log(session->log_ctx, OFIX_WARN, "Parse error: %s", err.msg);
 	    } else {
 		int64_t		seq = ofix_msg_get_int(&err, msg, OFIX_MsgSeqNumTAG);
 		const char	*mt = ofix_msg_get_str(&err, msg, OFIX_MsgTypeTAG);
@@ -246,7 +251,8 @@ session_loop(void *arg) {
 		    struct tm	*tm = gmtime(&now);
 
 		    if (NULL == sid) {
-			printf("*** Message did not contain a sender identifier. Closing session.\n");
+			session->log(session->log_ctx, OFIX_WARN,
+				     "Message did not contain a sender identifier. Closing session.");
 			session->done = true;
 			break;
 		    }
@@ -259,15 +265,18 @@ session_loop(void *arg) {
 		}
 		ofix_store_add(&err, session->store, seq, OFIX_IODIR_RECV, msg);
 		if (NULL == mt) {
-		    printf("*** Invalid message. No MsgType field.\n");
+		    session->log(session->log_ctx, OFIX_WARN, "Invalid message. No MsgType field.");
 		} else if (NULL == sid || 0 != strcmp(session->tid, sid)) {
-		    printf("*** Error: -Expected sender of '%s'. Received '%s'.\n", session->tid, (NULL == sid ? "<null>" : sid));
+		    session->log(session->log_ctx, OFIX_WARN,
+				 "Expected sender of '%s'. Received '%s'.", session->tid, (NULL == sid ? "<null>" : sid));
 		    session->recv_seq = seq;
 		} else if (session->recv_seq == seq) {
-		    printf("*** Warn: Duplicate message  from '%s'.\n", session->tid);
+		    session->log(session->log_ctx, OFIX_WARN,
+				 "Duplicate message  from '%s'.", session->tid);
 		    // TBD check dup flag if the same
 		} else if (session->recv_seq + 1 != seq) {
-		    printf("*** Error: '%s' did not send the correct sequence number.\n", session->tid);
+		    session->log(session->log_ctx, OFIX_WARN,
+				 "'%s' did not send the correct sequence number.", session->tid);
 		} else if (handle_session_msg(&err, session, mt, msg)) {
 		    // TBD if seq is not the next then error, try to recover
 		    session->recv_seq = seq;
@@ -282,7 +291,7 @@ session_loop(void *arg) {
 	    start += msg_len;
 	    msg_len = 0;
 	    if (OFIX_OK != err.code) {
-		printf("*** Error: [%d] %s.\n", err.code, err.msg);
+		session->log(session->log_ctx, OFIX_WARN, "[%d] %s.", err.code, err.msg);
 		ofix_err_clear(&err);
 	    }
 	}
@@ -341,10 +350,10 @@ ofix_session_send(ofixErr err, ofixSession session, ofixMsg msg) {
     ofix_msg_set_int(err, msg, OFIX_MsgSeqNumTAG, seq);
     cnt = ofix_msg_size(err, msg);
 
-    // TBD
-    if (true) {
+    if (session->log_on(session->log_ctx, OFIX_DEBUG)) {
 	char	*s = ofix_msg_to_str(err, msg);
-	printf("*** sending %s\n", s);
+
+	session->log(session->log_ctx, OFIX_DEBUG, "Sending %s", s);
 	free(s);
     }
     str = ofix_msg_FIX_str(err, msg);
