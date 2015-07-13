@@ -73,8 +73,7 @@ ofix_client_destroy(ofixErr err, ofixClient client) {
 
 static void
 logon(ofixErr err, ofixClient client) {
-    // TBD use a configured version
-    ofixMsg	msg = ofix_msg_create(err, "A", 4, 4, 14);
+    ofixMsg	msg = ofix_session_create_msg(err, &client->session, "A");
 
     if (NULL == msg) {
 	return;
@@ -91,6 +90,17 @@ logon(ofixErr err, ofixClient client) {
     }
     client->session.logon_sent = true;
     ofix_client_send(err, client, msg);
+}
+
+void
+ofix_client_logout(ofixErr err, ofixClient client, const char *txt) {
+    double	expire = dtime() + LOGOUT_TIMEOUT;
+
+    ofix_session_logout(err, &client->session, txt);
+
+    while (dtime() < expire && !client->session.done) {
+	dsleep(0.1);
+    }
 }
 
 void

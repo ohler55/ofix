@@ -46,6 +46,8 @@ extern void	ofix_client_destroy(ofixErr err, ofixClient client);
  */
 extern void	ofix_client_connect(ofixErr err, ofixClient client, const char *host, int port, double timeout);
 
+extern void	ofix_client_logout(ofixErr err, ofixClient client, const char *txt);
+
 /**
  *
  *

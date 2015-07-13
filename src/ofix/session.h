@@ -34,6 +34,8 @@ typedef bool	(*ofixRecvCallback)(ofixSession session, ofixMsg msg, void *ctx);
  */
 extern void	ofix_session_send(ofixErr err, ofixSession session, ofixMsg msg);
 
+extern void	ofix_session_logout(ofixErr err, ofixSession session, const char *txt, ...);
+
 /**
  *
  *

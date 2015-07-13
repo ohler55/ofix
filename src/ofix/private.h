@@ -10,10 +10,13 @@
 #include "store.h"
 #include "session.h"
 
+#define LOGOUT_TIMEOUT	2.0
+
 struct _ofixSession {
     char		*sid; // sender ID
     char		*tid; // target ID
     ofixVersionSpec	spec;
+    char		version_str[16];
     int64_t		sent_seq; // last sent sequence number
     int64_t		recv_seq; // last recieved sequence number
     char		store_dir[1024];
@@ -27,6 +30,7 @@ struct _ofixSession {
     bool		closed;
     bool		logon_sent;
     bool		logon_recv;
+    double		logout_sent;
     pthread_t		thread;
     pthread_mutex_t	send_mutex;
     ofixLogOn		log_on;

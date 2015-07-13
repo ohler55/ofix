@@ -246,11 +246,12 @@ normal_test() {
 	}
     }
 
-    // TBD Logout
+    ofix_client_logout(&err, client, "bye bye");
 
     ofix_client_destroy(&err, client);
     ofix_engine_destroy(&err, server);
 
+    // TBD check log file as well as client_storage
     log_same(client_storage,
 	     "zzzzzz");
 }

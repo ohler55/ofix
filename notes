@@ -4,16 +4,8 @@
 ^c^s show subtree
 
 - engine
- - add log functions and context
-  - function to set
-  - default is stdout
-  - func to replace log message to both server and client
-  - void (log*)(level, format, ...) 
-  - bool (on*)(level) 
- - Logon
-  - get FIX from message version
-  - is a version needed on client logon?
- - Logout 
+ - complete normal test
+  - read and compare files
  - Heartbeat
  - TestRequest
  - ResendRequest
@@ -28,4 +20,4 @@
   - test request
   - resend
   - seq reset
-  - reject
+  - rejects (various reasons)

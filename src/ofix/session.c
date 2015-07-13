@@ -56,6 +56,12 @@ _ofix_session_init(ofixErr err,
 	return;
     }
     s->spec = spec;
+    if (NULL == spec) {
+	*s->version_str = '\0';
+    } else {
+	snprintf(s->version_str, sizeof(s->version_str), "FIX.%d.%d", spec->major, spec->minor);
+	s->version_str[sizeof(s->version_str) - 1] = '\0';
+    }
     s->sent_seq = 0;
     s->recv_seq = 0;
     s->sock = 0;
@@ -90,6 +96,7 @@ _ofix_session_init(ofixErr err,
     s->closed = true;
     s->logon_sent = false;
     s->logon_recv = false;
+    s->logout_sent = 0.0;
 }
 
 void
@@ -124,11 +131,19 @@ ofix_session_create_msg(ofixErr err, ofixSession session, const char *type) {
 
 static void
 handle_logon(ofixErr err, ofixSession session, ofixMsg msg) {
-    session->target_heartbeat_interval = (int)ofix_msg_get_int(err, msg, OFIX_HeartBtIntTAG);
-    // TBD check spec version and logout if not the same or adapt later
-    // TBD if encrypt does not match send logout
+    const char	*s = ofix_msg_get_str(err, msg, OFIX_BeginStringTAG);
+
+    if (NULL == s || 0 != strcmp(session->version_str, s)) {
+	ofix_session_logout(err, session, "Wrong FIX version. Expected %s. Recieved %s.", session->version_str, s);
+	return;
+    }
+    if (0 != ofix_msg_get_int(err, msg, OFIX_EncryptMethodTAG)) {
+	ofix_session_logout(err, session, "Encryption is not supported.");
+    }
+    
     // TBD validate sender and user/password and logout it not accepted
     // TBD verify sequence number (if there is some predefined start number)
+    session->target_heartbeat_interval = (int)ofix_msg_get_int(err, msg, OFIX_HeartBtIntTAG);
     if (!session->logon_sent) {
 	ofixMsg	reply = ofix_session_create_msg(err, session, "A");
 
@@ -140,6 +155,22 @@ handle_logon(ofixErr err, ofixSession session, ofixMsg msg) {
 	ofix_session_send(err, session, reply);
     }
     session->logon_recv = true;
+}
+
+static void
+handle_logout(ofixErr err, ofixSession session, ofixMsg msg) {
+    ofixMsg	reply;
+
+    if (0.0 < session->logout_sent) {
+	session->done = true;
+	return;
+    }
+    if (NULL != (reply = ofix_session_create_msg(err, session, "5"))) {
+	ofix_session_send(err, session, reply);
+    }
+    // Even if failed to send, set the loutout_sent time so that the socket will
+    // get closed.
+    session->logout_sent = dtime();
 }
 
 static bool
@@ -156,7 +187,10 @@ handle_session_msg(ofixErr err, ofixSession session, const char *mt, ofixMsg msg
     case '2': // ResendRequest
     case '3': // Reject
     case '4': // SequenceReset
+	return false;
     case '5': // Logout
+	handle_logout(err, session, msg);
+	break;
     default:
 	return false;
     }
@@ -214,10 +248,15 @@ session_loop(void *arg) {
 		    b += rcnt;
 		}
 	    } else if (0 == cnt) {
+		if (0.0 < session->logout_sent && session->logout_sent < dtime() + LOGOUT_TIMEOUT) {
+		    session->done = true;
+		}
 		continue;
 	    } else {
-		// TBD if after logout then no error
-		session->log(session->log_ctx, OFIX_WARN, "select error %d - %s", errno, strerror(errno));
+		if (0.0 >= session->logout_sent) {
+		    // Only an error if there was no logout sent.
+		    session->log(session->log_ctx, OFIX_WARN, "select error %d - %s", errno, strerror(errno));
+		}
 		session->done = true;
 		break;
 	    }
@@ -229,8 +268,13 @@ session_loop(void *arg) {
 		session->log(session->log_ctx, OFIX_WARN,
 			     "Failed to parse message length, aborting '%s'", start);
 		break;
+	    } else if (sizeof(buf) <= msg_len) {
+		// TBD if msg_len is greater than buf then allocate,exit for now
+		session->log(session->log_ctx, OFIX_ERROR,
+			     "Message length too long. Limit is %lu, aborting '%s'", sizeof(buf) - 1);
+		session->done = true;
+		break;
 	    }
-	    // TBD if msg_len is greater than buf then allocate,exit for now
 	}
 	if (0 < msg_len && msg_len <= b - start) {
 	    struct _ofixErr	err = OFIX_ERR_INIT;
@@ -268,8 +312,11 @@ session_loop(void *arg) {
 		    session->log(session->log_ctx, OFIX_WARN, "Invalid message. No MsgType field.");
 		} else if (NULL == sid || 0 != strcmp(session->tid, sid)) {
 		    session->log(session->log_ctx, OFIX_WARN,
-				 "Expected sender of '%s'. Received '%s'.", session->tid, (NULL == sid ? "<null>" : sid));
+				 "Expected sender of '%s'. Received '%s'. Logging out.",
+				 session->tid, (NULL == sid ? "<null>" : sid));
 		    session->recv_seq = seq;
+		    ofix_session_logout(&err, session, "Expected sender of '%s'. Received '%s'.",
+					session->tid, (NULL == sid ? "<null>" : sid));
 		} else if (session->recv_seq == seq) {
 		    session->log(session->log_ctx, OFIX_WARN,
 				 "Duplicate message  from '%s'.", session->tid);
@@ -277,8 +324,11 @@ session_loop(void *arg) {
 		} else if (session->recv_seq + 1 != seq) {
 		    session->log(session->log_ctx, OFIX_WARN,
 				 "'%s' did not send the correct sequence number.", session->tid);
-		} else if (handle_session_msg(&err, session, mt, msg)) {
 		    // TBD if seq is not the next then error, try to recover
+		    ofix_session_logout(&err, session, 
+					"'%s' did not send the correct sequence number. Received %lld. Expected %lld.",
+					session->tid, (long long)seq, (long long)session->recv_seq + 1);
+		} else if (handle_session_msg(&err, session, mt, msg)) {
 		    session->recv_seq = seq;
 		} else if (NULL != session->recv_cb) {
 		    session->recv_seq = seq;
@@ -345,6 +395,9 @@ ofix_session_send(ofixErr err, ofixSession session, ofixMsg msg) {
     ofix_msg_set_str(err, msg, OFIX_TargetCompIDTAG, session->tid);
 
     pthread_mutex_lock(&session->send_mutex);
+    if (NULL != (str = ofix_msg_get_str(err, msg, OFIX_MsgTypeTAG)) && '5' == *str && '\0' == str[1]) {
+	session->logout_sent = dtime();
+    }
     session->sent_seq++;
     seq = session->sent_seq;
     ofix_msg_set_int(err, msg, OFIX_MsgSeqNumTAG, seq);
@@ -383,3 +436,23 @@ int64_t
 ofix_session_recv_seqnum(ofixSession session) {
     return session->recv_seq;
 }
+
+void
+ofix_session_logout(ofixErr err, ofixSession session, const char *txt, ...) {
+    ofixMsg	msg = ofix_session_create_msg(err, session, "5");
+
+    if (NULL == msg) {
+	return;
+    }
+    if (NULL != txt) {
+	char	buf[4096];
+	va_list	ap;
+
+	va_start(ap, txt);
+	vsnprintf(buf, sizeof(buf), txt, ap);
+	va_end(ap);
+	ofix_msg_set_str(err, msg, OFIX_TextTAG, buf);
+    }
+    ofix_session_send(err, session, msg);
+}
+
