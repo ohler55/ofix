@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "msg.h"
 #include "tag.h"
@@ -420,8 +421,30 @@ ofix_msg_create_from_spec(ofixErr err, ofixMsgSpec spec, int field_cnt) {
     return msg;
 }
 
+static void
+set_parse_error(ofixErr err, const char *mt, int tag, ofixReason reason, const char *fmt, ...) {
+    if (NULL == err) {
+	return;
+    }
+    va_list	ap;
+
+    va_start(ap, fmt);
+    err->code = OFIX_PARSE_ERR;
+    err->reason = reason;
+    err->tag = tag;
+    if (NULL == mt || '\0' == *mt) {
+	*err->msg_type = '\0';
+    } else {
+	strncpy(err->msg_type, mt, sizeof(err->msg_type));
+	err->msg_type[sizeof(err->msg_type) - 1] = '\0';
+    }
+    vsnprintf(err->msg, sizeof(err->msg), fmt, ap);
+    va_end(ap);
+}
+
 ofixMsg
 ofix_msg_parse(ofixErr err, const char *str, int len) {
+    char		type[8];
     const char		*b = str;
     const char		*end = str + len;
     char		*r, *raw;
@@ -437,6 +460,7 @@ ofix_msg_parse(ofixErr err, const char *str, int len) {
     if (NULL != err && OFIX_OK != err->code) {
 	return NULL;
     }
+    *type = '\0';
     if (NULL == (raw = (char*)malloc(len + 1))) {
 	if (NULL != err) {
 	    err->code = OFIX_MEMORY_ERR;
@@ -476,10 +500,8 @@ ofix_msg_parse(ofixErr err, const char *str, int len) {
 	    }
 	}
 	if ('=' != *b) {
-	    if (NULL != err) {
-		err->code = OFIX_PARSE_ERR;
-		snprintf(err->msg, sizeof(err->msg), "Invalid tag at position %ld.", (b - str));
-	    }
+	    set_parse_error(err, type, 0, OFIX_REASON_INVALID_TAG,
+			    "Invalid tag at position %ld.", (b - str));
 	    ofix_msg_destroy(msg);
 	    return NULL;
 	}
@@ -491,27 +513,20 @@ ofix_msg_parse(ofixErr err, const char *str, int len) {
 	if (OFIX_CheckSumTAG == tag) {
 	    f = &msg->check_sum_field;
 	} else if (&msg->check_sum_field == f) {
-	    if (NULL != err) {
-		err->code = OFIX_PARSE_ERR;
-		snprintf(err->msg, sizeof(err->msg), "CheckSum is not the last tag at position %ld.", (b - str));
-	    }
+	    set_parse_error(err, type, tag, OFIX_REASON_ORDER_TAG,
+			    "CheckSum is not the last tag at position %ld.", (b - str));
 	    ofix_msg_destroy(msg);
 	    return NULL;
 	}
 	if (OFIX_BeginStringTAG == tag) {
 	    f->ref = &begin_string_spec;
 	} else if (0 == versionSpec) {
-	    if (NULL != err) {
-		err->code = OFIX_PARSE_ERR;
-		snprintf(err->msg, sizeof(err->msg), "BeginString tag not first.");
-	    }
+	    set_parse_error(err, type, tag, OFIX_REASON_ORDER_TAG, "BeginString tag not first.");
 	    ofix_msg_destroy(msg);
 	    return NULL;
 	} else if (NULL == (f->ref = ofix_version_spec_get_tag_spec(err, versionSpec, tag, true))) {
-	    if (NULL != err) {
-		err->code = OFIX_PARSE_ERR;
-		snprintf(err->msg, sizeof(err->msg), "Invalid tag %d at position %ld.", tag, (b - str));
-	    }
+	    set_parse_error(err, type, tag, OFIX_REASON_UNDEFINED_TAG,
+			    "Undefined tag %d at position %ld.", tag, (b - str));
 	    ofix_msg_destroy(msg);
 	    return NULL;
 	}
@@ -522,10 +537,7 @@ ofix_msg_parse(ofixErr err, const char *str, int len) {
 	    cnt = 0;
 	    for (; SOH != *b; b++) {
 		if (end <= b) {
-		    if (NULL != err) {
-			err->code = OFIX_PARSE_ERR;
-			snprintf(err->msg, sizeof(err->msg), "Unexpected end of message.");
-		    }
+		    set_parse_error(err, type, tag, OFIX_REASON_OTHER, "Unexpected end of message.");
 		    ofix_msg_destroy(msg);
 		    return NULL;
 		}
@@ -536,19 +548,14 @@ ofix_msg_parse(ofixErr err, const char *str, int len) {
 	    break;
 	case OFIX_Data:
 	    if (nextTag != tag) {
-		if (NULL != err) {
-		    err->code = OFIX_PARSE_ERR;
-		    snprintf(err->msg, sizeof(err->msg),
-			     "Tag %d out of order at position %d. Expected Data tag %d.", tag, f->vpos, nextTag);
-		}
+		set_parse_error(err, type, tag, OFIX_REASON_ORDER_TAG,
+				"Tag %d out of order at position %d. Expected Data tag %d.",
+				tag, f->vpos, nextTag);
 		ofix_msg_destroy(msg);
 		return NULL;
 	    }
 	    if (len < f->vpos + cnt + 1) {
-		if (NULL != err) {
-		    err->code = OFIX_PARSE_ERR;
-		    snprintf(err->msg, sizeof(err->msg), "Unexpected end of message.");
-		}
+		set_parse_error(err, type, tag, OFIX_REASON_OTHER, "Unexpected end of message.");
 		ofix_msg_destroy(msg);
 		return NULL;
 	    }
@@ -562,10 +569,7 @@ ofix_msg_parse(ofixErr err, const char *str, int len) {
 	default:
 	    for (; SOH != *b; b++) {
 		if (end <= b) {
-		    if (NULL != err) {
-			err->code = OFIX_PARSE_ERR;
-			snprintf(err->msg, sizeof(err->msg), "Unexpected end of message.");
-		    }
+		    set_parse_error(err, type, tag, OFIX_REASON_OTHER, "Unexpected end of message.");
 		    ofix_msg_destroy(msg);
 		    return NULL;
 		}
@@ -576,29 +580,19 @@ ofix_msg_parse(ofixErr err, const char *str, int len) {
 		const char	*vstr = str + f->vpos;
 
 		if (7 != f->vlen) {
-		    if (NULL != err) {
-			err->code = OFIX_PARSE_ERR;
-			snprintf(err->msg, sizeof(err->msg), "Invalid message type.");
-		    }
+		    set_parse_error(err, type, tag, OFIX_REASON_BAD_FORMAT, "Incorrect format.");
 		    ofix_msg_destroy(msg);
 		    return NULL;
 		}
 		if (NULL == (versionSpec = ofix_get_spec(err, *(vstr + 4) - '0', *(vstr + 6) - '0'))) {
-		    if (NULL != err) {
-			err->code = OFIX_PARSE_ERR;
-			snprintf(err->msg, sizeof(err->msg), "FIX version %c.%c not supported.", *(vstr + 4), *(vstr + 6));
-		    }
+		    set_parse_error(err, type, tag, OFIX_REASON_BAD_VALUE,
+				    "FIX version %c.%c not supported.", *(vstr + 4), *(vstr + 6));
 		    ofix_msg_destroy(msg);
 		    return NULL;
 		}
 	    } else if (OFIX_MsgTypeTAG == tag) {
-		char	type[8];
-
 		if (sizeof(type) <= f->vlen) {
-		    if (NULL != err) {
-			err->code = OFIX_PARSE_ERR;
-			snprintf(err->msg, sizeof(err->msg), "Invalid message type.");
-		    }
+		    set_parse_error(err, type, tag, OFIX_REASON_BAD_FORMAT, "Incorrect format.");
 		    ofix_msg_destroy(msg);
 		    return NULL;
 		}
@@ -887,6 +881,7 @@ ofix_msg_get_int(ofixErr err, ofixMsg msg, int tag) {
     }
     if (bad) {
 	char	buf[64];
+	char	mt[8];
 
 	if (f->vlen < sizeof(buf) - 1) {
 	    strncpy(buf, msg->raw + f->vpos, f->vlen);
@@ -895,11 +890,9 @@ ofix_msg_get_int(ofixErr err, ofixMsg msg, int tag) {
 	    strncpy(buf, msg->raw + f->vpos, sizeof(buf) - 1);
 	    buf[sizeof(buf) - 1] = '\0';
 	}
-	if (NULL != err) {
-	    err->code = OFIX_PARSE_ERR;
-	    snprintf(err->msg, sizeof(err->msg),
-		     "The string %s for tag %d (%s) can not be parsed as an integer.", buf, tag, f->ref->name);
-	}
+	set_parse_error(err, ofix_msg_copy_str(NULL, msg, OFIX_MsgTypeTAG, mt, sizeof(mt)),
+			tag, OFIX_REASON_BAD_FORMAT,
+			"'%s' for tag %d (%s) can not be parsed as an integer.", buf, tag, f->ref->name);
 	return 0;
     }
     if (neg) {
@@ -950,13 +943,15 @@ ofix_msg_get_bool(ofixErr err, ofixMsg msg, int tag) {
     case 'Y':	v = true;	break;
     case 'N':	v = false;	break;
     default:
-	if (NULL != err) {
-	    err->code = OFIX_PARSE_ERR;
-	    snprintf(err->msg, sizeof(err->msg),
-		     "The value '%c' for tag %d (%s) is not a boolean value (Y or N).",
-		     *(msg->raw + f->vpos), tag, f->ref->name);
+	{
+	    char	mt[8];
+
+	    set_parse_error(err, ofix_msg_copy_str(NULL, msg, OFIX_MsgTypeTAG, mt, sizeof(mt)),
+			    tag, OFIX_REASON_BAD_VALUE,
+			    "'%c' for tag %d (%s) is not a boolean value (Y or N).",
+			    *(msg->raw + f->vpos), tag, f->ref->name);
+	    break;
 	}
-	break;
     }
     return v;
 }
@@ -985,15 +980,17 @@ ofix_msg_get_str(ofixErr err, ofixMsg msg, int tag) {
     return str;
 }
 
-void
+char*
 ofix_msg_copy_str(ofixErr err, ofixMsg msg, int tag, char *value, int maxLen) {
     Field	f;
 
     if (NULL != err && OFIX_OK != err->code) {
-	return;
+	*value = '\0';
+	return value;
     }
     if (0 == (f = get_tag_field_or_error(err, msg, tag))) {
-	return;
+	*value = '\0';
+	return value;
     }
     maxLen--;
     if (f->vlen < maxLen) {
@@ -1001,6 +998,8 @@ ofix_msg_copy_str(ofixErr err, ofixMsg msg, int tag, char *value, int maxLen) {
     }
     strncpy(value, msg->raw + f->vpos, maxLen);
     value[maxLen] = '\0';
+
+    return value;
 }
 
 double
@@ -1020,6 +1019,7 @@ ofix_msg_get_float(ofixErr err, ofixMsg msg, int tag) {
     num = strtod(start, &end);
     if (end != start + f->vlen) {
 	char	buf[64];
+	char	mt[8];
 
 	if (f->vlen < sizeof(buf) - 1) {
 	    strncpy(buf, msg->raw + f->vpos, f->vlen);
@@ -1028,11 +1028,9 @@ ofix_msg_get_float(ofixErr err, ofixMsg msg, int tag) {
 	    strncpy(buf, msg->raw + f->vpos, sizeof(buf) - 1);
 	    buf[sizeof(buf) - 1] = '\0';
 	}
-	if (NULL != err) {
-	    err->code = OFIX_PARSE_ERR;
-	    snprintf(err->msg, sizeof(err->msg),
-		     "The string %s for tag %d (%s) can not be parsed as a float.", buf, tag, f->ref->name);
-	}
+	set_parse_error(err, ofix_msg_copy_str(NULL, msg, OFIX_MsgTypeTAG, mt, sizeof(mt)),
+			tag, OFIX_REASON_BAD_FORMAT,
+			"'%s' for tag %d (%s) can not be parsed as a float.", buf, tag, f->ref->name);
 	return 0.0;
     }
     return num;
@@ -1083,6 +1081,7 @@ ofix_msg_get_timestamp(ofixErr err, ofixMsg msg, int tag, ofixDate value) {
     }
     if (bad || !ofix_date_is_valid(value)) {
 	char	buf[64];
+	char	mt[8];
 
 	if (f->vlen < sizeof(buf) - 1) {
 	    strncpy(buf, msg->raw + f->vpos, f->vlen);
@@ -1091,11 +1090,9 @@ ofix_msg_get_timestamp(ofixErr err, ofixMsg msg, int tag, ofixDate value) {
 	    strncpy(buf, msg->raw + f->vpos, sizeof(buf) - 1);
 	    buf[sizeof(buf) - 1] = '\0';
 	}
-	if (NULL != err) {
-	    err->code = OFIX_PARSE_ERR;
-	    snprintf(err->msg, sizeof(err->msg),
-		     "The string %s for tag %d (%s) can not be parsed as a timestamp.", buf, tag, f->ref->name);
-	}
+	set_parse_error(err, ofix_msg_copy_str(NULL, msg, OFIX_MsgTypeTAG, mt, sizeof(mt)),
+			tag, OFIX_REASON_BAD_FORMAT,
+			"'%s' for tag %d (%s) can not be parsed as a timestamp.", buf, tag, f->ref->name);
     }
 }
 
@@ -1138,6 +1135,7 @@ ofix_msg_get_time(ofixErr err, ofixMsg msg, int tag, ofixDate value) {
     }
     if (bad || !ofix_date_is_valid(value)) {
 	char	buf[64];
+	char	mt[8];
 
 	if (f->vlen < sizeof(buf) - 1) {
 	    strncpy(buf, msg->raw + f->vpos, f->vlen);
@@ -1146,11 +1144,9 @@ ofix_msg_get_time(ofixErr err, ofixMsg msg, int tag, ofixDate value) {
 	    strncpy(buf, msg->raw + f->vpos, sizeof(buf) - 1);
 	    buf[sizeof(buf) - 1] = '\0';
 	}
-	if (NULL != err) {
-	    err->code = OFIX_PARSE_ERR;
-	    snprintf(err->msg, sizeof(err->msg),
-		     "The string %s for tag %d (%s) can not be parsed as a time.", buf, tag, f->ref->name);
-	}
+	set_parse_error(err, ofix_msg_copy_str(NULL, msg, OFIX_MsgTypeTAG, mt, sizeof(mt)),
+			tag, OFIX_REASON_BAD_FORMAT,
+			"'%s' for tag %d (%s) can not be parsed as a time.", buf, tag, f->ref->name);
     }
 }
 
@@ -1189,6 +1185,7 @@ ofix_msg_get_time_only(ofixErr err, ofixMsg msg, int tag, ofixDate value) {
     }
     if (bad || !ofix_date_is_valid(value)) {
 	char	buf[64];
+	char	mt[8];
 
 	if (f->vlen < sizeof(buf) - 1) {
 	    strncpy(buf, msg->raw + f->vpos, f->vlen);
@@ -1197,11 +1194,9 @@ ofix_msg_get_time_only(ofixErr err, ofixMsg msg, int tag, ofixDate value) {
 	    strncpy(buf, msg->raw + f->vpos, sizeof(buf) - 1);
 	    buf[sizeof(buf) - 1] = '\0';
 	}
-	if (NULL != err) {
-	    err->code = OFIX_PARSE_ERR;
-	    snprintf(err->msg, sizeof(err->msg),
-		     "The string %s for tag %d (%s) can not be parsed as a time only.", buf, tag, f->ref->name);
-	}
+	set_parse_error(err, ofix_msg_copy_str(NULL, msg, OFIX_MsgTypeTAG, mt, sizeof(mt)),
+			tag, OFIX_REASON_BAD_FORMAT,
+			"'%s' for tag %d (%s) can not be parsed as a time only.", buf, tag, f->ref->name);
     }
 }
 
@@ -1235,6 +1230,7 @@ ofix_msg_get_date_only(ofixErr err, ofixMsg msg, int tag, ofixDate value) {
     }
     if (bad || !ofix_date_is_valid(value)) {
 	char	buf[64];
+	char	mt[8];
 
 	if (f->vlen < sizeof(buf) - 1) {
 	    strncpy(buf, msg->raw + f->vpos, f->vlen);
@@ -1243,11 +1239,9 @@ ofix_msg_get_date_only(ofixErr err, ofixMsg msg, int tag, ofixDate value) {
 	    strncpy(buf, msg->raw + f->vpos, sizeof(buf) - 1);
 	    buf[sizeof(buf) - 1] = '\0';
 	}
-	if (NULL != err) {
-	    err->code = OFIX_PARSE_ERR;
-	    snprintf(err->msg, sizeof(err->msg),
-		     "The string %s for tag %d (%s) can not be parsed as a timestamp.", buf, tag, f->ref->name);
-	}
+	set_parse_error(err, ofix_msg_copy_str(NULL, msg, OFIX_MsgTypeTAG, mt, sizeof(mt)),
+			tag, OFIX_REASON_BAD_FORMAT,
+			"'%s' for tag %d (%s) can not be parsed as a date only.", buf, tag, f->ref->name);
     }
 }
 
@@ -1279,6 +1273,7 @@ ofix_msg_get_yyyymm(ofixErr err, ofixMsg msg, int tag, ofixDate value) {
     }
     if (bad || !ofix_date_is_valid(value)) {
 	char	buf[64];
+	char	mt[8];
 
 	if (f->vlen < sizeof(buf) - 1) {
 	    strncpy(buf, msg->raw + f->vpos, f->vlen);
@@ -1287,11 +1282,9 @@ ofix_msg_get_yyyymm(ofixErr err, ofixMsg msg, int tag, ofixDate value) {
 	    strncpy(buf, msg->raw + f->vpos, sizeof(buf) - 1);
 	    buf[sizeof(buf) - 1] = '\0';
 	}
-	if (NULL != err) {
-	    err->code = OFIX_PARSE_ERR;
-	    snprintf(err->msg, sizeof(err->msg),
-		     "The string %s for tag %d (%s) can not be parsed as a YYYYMM.", buf, tag, f->ref->name);
-	}
+	set_parse_error(err, ofix_msg_copy_str(NULL, msg, OFIX_MsgTypeTAG, mt, sizeof(mt)),
+			tag, OFIX_REASON_BAD_FORMAT,
+			"'%s' for tag %d (%s) can not be parsed as a YYYYMM.", buf, tag, f->ref->name);
     }
 }
 
@@ -1328,6 +1321,7 @@ ofix_msg_get_yyyymmww(ofixErr err, ofixMsg msg, int tag, ofixDate value) {
     }
     if (bad || !ofix_date_is_valid(value)) {
 	char	buf[64];
+	char	mt[8];
 
 	if (f->vlen < sizeof(buf) - 1) {
 	    strncpy(buf, msg->raw + f->vpos, f->vlen);
@@ -1336,11 +1330,9 @@ ofix_msg_get_yyyymmww(ofixErr err, ofixMsg msg, int tag, ofixDate value) {
 	    strncpy(buf, msg->raw + f->vpos, sizeof(buf) - 1);
 	    buf[sizeof(buf) - 1] = '\0';
 	}
-	if (NULL != err) {
-	    err->code = OFIX_PARSE_ERR;
-	    snprintf(err->msg, sizeof(err->msg),
-		     "The string %s for tag %d (%s) can not be parsed as a YYYYMMwW.", buf, tag, f->ref->name);
-	}
+	set_parse_error(err, ofix_msg_copy_str(NULL, msg, OFIX_MsgTypeTAG, mt, sizeof(mt)),
+			tag, OFIX_REASON_BAD_FORMAT,
+			"'%s' for tag %d (%s) can not be parsed as a YYYYMMWW.", buf, tag, f->ref->name);
     }
 }
 

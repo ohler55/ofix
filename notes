@@ -6,11 +6,10 @@
 - engine
  - Reject
   - bad seq num
-  - bad target
-  - no msgtype or other missing fields
-  - duplicate or out of order message
-
- - allow duplicate seq if pos-resend it true
+   - allow duplicate seq if pos-resend it true
+   - other wise reject but do not logout (or let app handle?)
+   - seq is before (same as dup but always reject?)
+   - after then request resend
 
  - tolerant option
   - allow out of order tags

@@ -187,19 +187,18 @@ send_reject(ofixErr err,
 	return;
     }
     ofix_msg_set_int(err, msg, OFIX_RefSeqNumTAG, seq);
-    if (NULL != msg_type) {
+    if (NULL != msg_type && '\0' != *msg_type) {
 	ofix_msg_set_str(err, msg, OFIX_RefMsgTypeTAG, msg_type);
     }
-    if (0 <= tag) {
+    if (0 < tag) {
 	ofix_msg_set_int(err, msg, OFIX_RefTagIDTAG, tag);
     }
     if (0 <= reason) {
 	ofix_msg_set_int(err, msg, OFIX_SessionRejectReasonTAG, reason);
     }
-    if (NULL != text) {
+    if (NULL != text && '\0' != *text) {
 	ofix_msg_set_str(err, msg, OFIX_TextTAG, text);
     }
-
     ofix_session_send(err, session, msg);
 }
 
@@ -317,12 +316,17 @@ session_loop(void *arg) {
 	    ofixMsg		msg = ofix_msg_parse(&err, start, msg_len);
 
 	    if (OFIX_OK != err.code) {
+		struct _ofixErr	rerr = OFIX_ERR_INIT;
+		
 		session->log(session->log_ctx, OFIX_WARN, "Parse error: %s", err.msg);
+		send_reject(&rerr, session, session->recv_seq + 1, err.msg_type, err.tag, err.reason, err.msg);
+		ofix_session_logout(&rerr, session, "%s", err.msg);
 	    } else {
 		int64_t		seq = ofix_msg_get_int(&err, msg, OFIX_MsgSeqNumTAG);
 		const char	*mt = ofix_msg_get_str(&err, msg, OFIX_MsgTypeTAG);
 		bool		keep = false;
 		const char	*sid = ofix_msg_get_str(&err, msg, OFIX_SenderCompIDTAG);
+		const char	*tid = ofix_msg_get_str(&err, msg, OFIX_TargetCompIDTAG);
 
 		if (NULL == session->store) {
 		    // Server just got it's first message on this session.
@@ -345,21 +349,29 @@ session_loop(void *arg) {
 		}
 		ofix_store_add(&err, session->store, seq, OFIX_IODIR_RECV, msg);
 		if (NULL == mt) {
-		    session->log(session->log_ctx, OFIX_WARN, "Invalid message. No MsgType field.");
-		    // TBD send reject
+		    session->log(session->log_ctx, OFIX_WARN, "Invalid message. Missing MsgType field.");
+		    send_reject(&err, session, seq, NULL, OFIX_MsgTypeTAG, OFIX_REASON_MISSING_TAG,
+				"Missing MsgType field");
+		    ofix_session_logout(&err, session, "Invalid message. Missing MsgType field");
 		} else if (NULL == sid || 0 != strcmp(session->tid, sid)) {
 		    char	err_buf[1024];
 
 		    snprintf(err_buf, sizeof(err_buf), "Expected sender of '%s'. Received '%s'.",
 			     session->tid, (NULL == sid ? "<null>" : sid));
 
-		    session->log(session->log_ctx, OFIX_WARN,
-				 "Expected sender of '%s'. Received '%s'. Logging out.",
-				 session->tid, (NULL == sid ? "<null>" : sid));
+		    session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
 		    session->recv_seq = seq;
-		    send_reject(&err, session, seq, mt, OFIX_SenderCompIDTAG, 5, err_buf);
-		    ofix_session_logout(&err, session, "Expected sender of '%s'. Received '%s'.",
-					session->tid, (NULL == sid ? "<null>" : sid));
+		    send_reject(&err, session, seq, mt, OFIX_SenderCompIDTAG, OFIX_REASON_COMP_ID, err_buf);
+		    ofix_session_logout(&err, session, "%s", err_buf);
+		} else if (NULL == tid || 0 != strcmp(session->sid, tid)) {
+		    char	err_buf[1024];
+
+		    snprintf(err_buf, sizeof(err_buf), "Expected target of '%s'. Received '%s'.",
+			     session->sid, (NULL == tid ? "<null>" : tid));
+		    session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
+		    session->recv_seq = seq;
+		    send_reject(&err, session, seq, mt, OFIX_TargetCompIDTAG, OFIX_REASON_COMP_ID, err_buf);
+		    ofix_session_logout(&err, session, "%s", err_buf);
 		} else if (session->recv_seq == seq) {
 		    session->log(session->log_ctx, OFIX_WARN,
 				 "Duplicate message  from '%s'.", session->tid);

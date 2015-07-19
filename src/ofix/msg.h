@@ -228,8 +228,9 @@ extern char*	ofix_msg_get_str(ofixErr err, ofixMsg msg, int tag);
  * @param tag the tag that identifies of field
  * @param value a char* to fill with the value of the field
  * @param maxLen the maximum characters to copy
+ * @return the value argument.
  */
-extern void	ofix_msg_copy_str(ofixErr err, ofixMsg msg, int tag, char *value, int maxLen);
+extern char*	ofix_msg_copy_str(ofixErr err, ofixMsg msg, int tag, char *value, int maxLen);
 
 /**
  * Attempts to read a double value from the field identified by a tag. The

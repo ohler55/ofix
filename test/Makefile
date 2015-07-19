@@ -17,6 +17,8 @@ all: $(TARGET)
 clean:
 	$(RM) $(OBJS)
 	$(RM) $(TARGET)
+	$(RM) -rf server_storage
+	$(RM) -rf client_storage
 
 $(LIB_DIR):
 	mkdir -p $@
