@@ -9,8 +9,8 @@
 
 static void
 run_test(char *msg_str, char *expected) {
-    char		actual[1024];
-    char		msg_buf[1024];
+    char		actual[4096];
+    char		msg_buf[4096];
     char		*a = actual;
     char		*b;
     struct _ofixErr	err = OFIX_ERR_INIT;
@@ -121,9 +121,18 @@ NewOrderSingle (D) [162]\n\
    10: 009 (String) @158\n");
 }
 
+#if 0
+static void
+random_test() {
+    run_test("8=FIX.4.2^9=221^35=D^34=220^49=GENFIN2^52=20150625-13:49:01.205^56=MSCO2^1=038302816^11=1435240141204-4^15=USD^18=1^21=2^38=74^40=2^44=67.1^50=JV_73fecf0913881ff5^54=1^55=D^57=SORT^59=0^60=20150625-13:49:01.204^126=20150625-13:49:51.204^10=157^",
+	    "zzzz");
+}
+#endif
+
 void
 append_parse_tests(Test tests) {
     test_append(tests, "parse.basic", basic_test);
     test_append(tests, "parse.with_data", with_data_test);
     test_append(tests, "parse.with_SOH", with_SOH_test);
+    //test_append(tests, "parse.random", random_test);
 }

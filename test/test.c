@@ -11,12 +11,12 @@
 static void	usage(const char *appName);
 static Test	find_test(const char *name);
 
-FILE		*test_out = 0;
+FILE		*test_out = NULL;
 int		test_verbose = 0;
 
-static const char	*group = 0;
-static Test		tests = 0;
-static Test		current_test = 0;
+static const char	*group = NULL;
+static Test		tests = NULL;
+static Test		current_test = NULL;
 
 void
 test_print(const char *format, ...) {
@@ -88,7 +88,7 @@ test_init(int argc, char **argv, const char *group_name, Test all_tests) {
     }
     test_print("%s tests started\n", group);
 
-    for (current_test = tests; current_test->name != 0; current_test++) {
+    for (current_test = tests; NULL != current_test->name; current_test++) {
 	if (current_test->run) {
 	    current_test->func();
 	}
@@ -172,7 +172,7 @@ test_same(const char *expected, const char *actual) {
 	current_test->pass = 0;
 	return 0;
     }
-    for (; '\0' != *e; e++, a++) {
+    for (; '\0' != *e && '\0' != *a; e++, a++) {
 	if (*e == *a || '?' == *e) {
 	    if ('\n' == *a) {
 		line++;
@@ -281,7 +281,7 @@ test_false(bool condition) {
 }
 
 char*
-test_loadFile(const char *filename) {
+test_load_file(const char *filename) {
     FILE	*f;
     char	*buf;
     long	len;

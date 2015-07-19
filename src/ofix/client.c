@@ -171,6 +171,11 @@ ofix_client_send(ofixErr err, ofixClient client, ofixMsg msg) {
     ofix_session_send(err, &client->session, msg);
 }
 
+void
+_ofix_client_raw_send(ofixErr err, ofixClient client, ofixMsg msg) {
+    _ofix_session_raw_send(err, &client->session, msg);
+}
+
 ofixMsg
 ofix_client_get_msg(ofixErr err, ofixClient client, int64_t seqnum) {
     return ofix_session_get_msg(err, &client->session, seqnum);

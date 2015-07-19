@@ -21,58 +21,38 @@
 #include "ofix/versionspec.h"
 
 extern ofixVersionSpec	ofix_get_spec(ofixErr err, int major, int minor);
+extern void		_ofix_client_raw_send(ofixErr err, ofixClient client, ofixMsg msg);
 
-static int	xid_cnt = 0;
+static int		xid_cnt = 0;
+static const char	*client_storage = "client_storage.fix";
+
+static char*
+load_fix_file(const char *filename) {
+    char	*contents = test_load_file(filename);
+
+    for (char *s = contents; '\0' != *s; s++) {
+	if ('\1' == *s) {
+	    *s = '^';
+	}
+    }
+    return contents;
+}
 
 static bool
 log_on(void *ctx, ofixLogLevel level) {
-    return true;
+    return false;
 }
 
 static void
 log(void *ctx, ofixLogLevel level, const char *format, ...) {
-    va_list	ap;
+    if (log_on(ctx, level)) {
+	va_list	ap;
     
-    va_start(ap, format);
-    vfprintf((FILE*)ctx, format, ap);
-    fputc('\n', (FILE*)ctx);
-    va_end(ap);
-}
-
-static void
-log_same(const char *log, const char *expect) {
-    FILE	*f = fopen(log, "r");
-    long	size = 0;
-    char	*contents;
-
-    if (NULL == f) {
-	test_print("Failed to open log file '%s'\n", log);
-	test_fail();
-	return;
+	va_start(ap, format);
+	vfprintf((FILE*)ctx, format, ap);
+	fputc('\n', (FILE*)ctx);
+	va_end(ap);
     }
-    fseek(f, 0, SEEK_END);
-    size = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    if (0 >= size || NULL == (contents = (char*)malloc(size + 1))) {
-	test_print("'%s' was empty\n", log);
-	test_fail();
-	fclose(f);
-	return;
-    }
-    if (size != fread(contents, 1, size, f)) {
-	test_print("Failed to read '%s'. %s\n", log, strerror(errno));
-	test_fail();
-	fclose(f);
-	return;
-    }
-    contents[size] = '\0';
-    fclose(f);
-    for (char *c = contents; '\0' != *c; c++) {
-	if ('\1' == *c) {
-	    *c = '^';
-	}
-    }
-    test_same(expect, contents);
 }
 
 static void*
@@ -133,13 +113,13 @@ client_cb(ofixSession session, ofixMsg msg, void *ctx) {
     struct _ofixErr	err = OFIX_ERR_INIT;
     char		*s = ofix_msg_to_str(&err, msg);
 
-    printf("*** client callback: %s\n", s);
+    //printf("*** client callback: %s\n", s);
     free(s);
     return true;
 }
 
 static void
-normal_test() {
+run_test(ofixMsg *msgs, bool raw) {
     struct _ofixErr	err = OFIX_ERR_INIT;
     const char		*client_storage = "client_storage.fix";
     ofixVersionSpec	vspec = ofix_get_spec(&err, 4, 4);
@@ -153,6 +133,7 @@ normal_test() {
     struct timeval	tv;
     struct timezone	tz;
     struct _ofixDate	now;
+    int			cnt;
 
     gettimeofday(&tv, &tz);
     ofix_date_set_timestamp(&now, (uint64_t)tv.tv_sec * 1000000LL + (uint64_t)tv.tv_usec);
@@ -163,7 +144,6 @@ normal_test() {
 	return;
     }
     ofix_engine_on_recv(server, server_cb, NULL);
-    // TBD change to write to file
     ofix_engine_set_log(server, log_on, log, stdout);
 
     // throw server into a separate thread
@@ -179,7 +159,6 @@ normal_test() {
 	test_fail();
 	return;
     }
-    // TBD change to write to file
     ofix_client_set_log(client, log_on, log, stdout);
 
     // wait for engine to start
@@ -220,25 +199,20 @@ normal_test() {
 	test_fail();
 	return;
     }
-    ofix_msg_set_str(&err, msg, OFIX_ClOrdIDTAG, "order-123");
-    ofix_msg_set_str(&err, msg, OFIX_SymbolTAG, "IBM");
-    ofix_msg_set_char(&err, msg, OFIX_SideTAG, '1'); // buy
-    ofix_msg_set_int(&err, msg, OFIX_OrderQtyTAG, 250);
-    ofix_msg_set_date(&err, msg, OFIX_TransactTimeTAG, &now);
-    ofix_msg_set_char(&err, msg, OFIX_OrdTypeTAG, '1'); // market order
-    if (OFIX_OK != err.code) {
-	test_print("Error while setting fields in message [%d] %s\n", err.code, err.msg);
-	test_fail();
-	return;
+    for (cnt = 1; NULL != *msgs; msgs++, cnt++) {
+	if (raw) {
+	    _ofix_client_raw_send(&err, client, *msgs);
+	} else {
+	    ofix_client_send(&err, client, *msgs);
+	}
     }
-
-    ofix_client_send(&err, client, msg);
-    ofix_msg_set_str(&err, msg, OFIX_ClOrdIDTAG, "order-124");
-    ofix_client_send(&err, client, msg);
 
     // wait for exchanges to complete
     giveup = dtime() + 1.0;
-    while (3 > ofix_client_recv_seqnum(client)) {
+    if (raw) { // only used for rejects
+	cnt++;
+    }
+    while (cnt > ofix_client_recv_seqnum(client)) {
 	if (giveup < dtime()) {
 	    test_print("Timed out waiting for client to receive responses.\n");
 	    test_fail();
@@ -250,10 +224,136 @@ normal_test() {
 
     ofix_client_destroy(&err, client);
     ofix_engine_destroy(&err, server);
+}
 
-    // TBD check log file as well as client_storage
-    log_same(client_storage,
-	     "zzzzzz");
+static void
+normal_test() {
+    struct _ofixErr	err = OFIX_ERR_INIT;
+    ofixMsgSpec		spec = ofix_version_spec_get_msg_spec(&err, "D", 4, 4);
+    ofixMsg		msg1;
+    ofixMsg		msg2;
+    ofixMsg		msgs[3];
+    const char		*s;
+    struct timeval	tv;
+    struct timezone	tz;
+    struct _ofixDate	now;
+    char		*actual;
+
+    gettimeofday(&tv, &tz);
+    ofix_date_set_timestamp(&now, (uint64_t)tv.tv_sec * 1000000LL + (uint64_t)tv.tv_usec);
+    
+    // Create an single order message.
+    // First get the message spec.
+    if (OFIX_OK != err.code || NULL == spec) {
+	test_print("Failed to find message spec for 'D' [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
+    msg1 = ofix_msg_create_from_spec(&err, spec, 16);
+    if (OFIX_OK != err.code || NULL == msg1) {
+	test_print("Failed to create message [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
+    ofix_msg_set_str(&err, msg1, OFIX_ClOrdIDTAG, "order-123");
+    ofix_msg_set_str(&err, msg1, OFIX_SymbolTAG, "IBM");
+    ofix_msg_set_char(&err, msg1, OFIX_SideTAG, '1'); // buy
+    ofix_msg_set_int(&err, msg1, OFIX_OrderQtyTAG, 250);
+    ofix_msg_set_date(&err, msg1, OFIX_TransactTimeTAG, &now);
+    ofix_msg_set_char(&err, msg1, OFIX_OrdTypeTAG, '1'); // market order
+    if (OFIX_OK != err.code) {
+	test_print("Error while setting fields in message [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
+
+    if (NULL == (s = ofix_msg_FIX_str(&err, msg1)) ||
+	NULL == (msg2 = ofix_msg_parse(&err, s, strlen(s))) ||
+	OFIX_OK != err.code) {
+	test_print("Error cloning message.\n");
+	test_fail();
+	return;
+    }
+    ofix_msg_set_str(&err, msg2, OFIX_ClOrdIDTAG, "order-124");
+    msgs[0] = msg1;
+    msgs[1] = msg2;
+    msgs[2] = NULL;
+
+    run_test(msgs, false);
+
+    actual = load_fix_file(client_storage);
+    test_same("sender: Client\n\
+\n\
+8=FIX.4.4^9=073^35=A^49=Client^56=Server^34=1^52=$-$:$:$.$^98=0^108=30^141=Y^10=$^\n\
+8=FIX.4.4^9=067^35=A^49=Server^56=Client^34=1^52=$-$:$:$.$^98=0^108=30^10=$^\n\
+8=FIX.4.4^9=117^35=D^49=Client^56=Server^34=2^52=$-$:$:$.$^11=order-123^55=IBM^54=1^60=$-$:$:$.$^38=250^40=1^10=$^\n\
+8=FIX.4.4^9=117^35=D^49=Client^56=Server^34=3^52=$-$:$:$.$^11=order-124^55=IBM^54=1^60=$-$:$:$.$^38=250^40=1^10=$^\n\
+8=FIX.4.4^9=117^35=8^49=Server^56=Client^34=2^52=$-$:$:$.$^37=order-123^17=x-1^150=0^39=0^55=IBM^54=1^151=250^14=250^6=0^10=$^\n\
+8=FIX.4.4^9=117^35=8^49=Server^56=Client^34=3^52=$-$:$:$.$^37=order-124^17=x-2^150=0^39=0^55=IBM^54=1^151=250^14=250^6=0^10=$^\n\
+8=FIX.4.4^9=066^35=5^49=Client^56=Server^34=4^52=$-$:$:$.$^58=bye bye^10=$^\n\
+8=FIX.4.4^9=055^35=5^49=Server^56=Client^34=4^52=$-$:$:$.$^10=$^\n",
+	      actual);
+    free(actual);
+}
+
+static void
+bad_sender_test() {
+    struct _ofixErr	err = OFIX_ERR_INIT;
+    ofixMsgSpec		spec = ofix_version_spec_get_msg_spec(&err, "D", 4, 4);
+    ofixMsg		msg1;
+    ofixMsg		msgs[2];
+    struct timeval	tv;
+    struct timezone	tz;
+    struct _ofixDate	now;
+    char		*actual;
+
+    gettimeofday(&tv, &tz);
+    ofix_date_set_timestamp(&now, (uint64_t)tv.tv_sec * 1000000LL + (uint64_t)tv.tv_usec);
+    
+    // Create an single order message.
+    // First get the message spec.
+    if (OFIX_OK != err.code || NULL == spec) {
+	test_print("Failed to find message spec for 'D' [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
+    msg1 = ofix_msg_create_from_spec(&err, spec, 16);
+    if (OFIX_OK != err.code || NULL == msg1) {
+	test_print("Failed to create message [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
+    ofix_msg_set_str(&err, msg1, OFIX_SenderCompIDTAG, "Bad");
+    ofix_msg_set_str(&err, msg1, OFIX_TargetCompIDTAG, "Server");
+    ofix_msg_set_int(&err, msg1, OFIX_MsgSeqNumTAG, 2);
+
+    ofix_msg_set_str(&err, msg1, OFIX_ClOrdIDTAG, "order-123");
+    ofix_msg_set_str(&err, msg1, OFIX_SymbolTAG, "IBM");
+    ofix_msg_set_char(&err, msg1, OFIX_SideTAG, '1'); // buy
+    ofix_msg_set_int(&err, msg1, OFIX_OrderQtyTAG, 250);
+    ofix_msg_set_date(&err, msg1, OFIX_TransactTimeTAG, &now);
+    ofix_msg_set_char(&err, msg1, OFIX_OrdTypeTAG, '1'); // market order
+    if (OFIX_OK != err.code) {
+	test_print("Error while setting fields in message [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
+    msgs[0] = msg1;
+    msgs[1] = NULL;
+
+    run_test(msgs, true);
+
+    actual = load_fix_file(client_storage);
+    test_same("sender: Client\n\
+\n\
+8=FIX.4.4^9=073^35=A^49=Client^56=Server^34=1^52=$-$:$:$.$^98=0^108=30^141=Y^10=$^\n\
+8=FIX.4.4^9=067^35=A^49=Server^56=Client^34=1^52=$-$:$:$.$^98=0^108=30^10=$^\n\
+8=FIX.4.4^9=114^35=D^49=Bad^56=Server^34=2^52=$-$:$:$.$^11=order-123^55=IBM^54=1^60=$-$:$:$.$^38=250^40=1^10=$^\n\
+8=FIX.4.4^9=127^35=3^49=Server^56=Client^34=2^52=$-$:$:$.$^45=2^371=49^372=D^373=5^58=Expected sender of 'Client'. Received 'Bad'.^10=$^\n\
+8=FIX.4.4^9=103^35=5^49=Server^56=Client^34=3^52=$-$:$:$.$^58=Expected sender of 'Client'. Received 'Bad'.^10=$^\n\
+8=FIX.4.4^9=055^35=5^49=Client^56=Server^34=3^52=$-$:$:$.$^10=$^\n",
+	      actual);
+    free(actual);
 }
 
 void
@@ -261,4 +361,5 @@ append_engine_tests(Test tests) {
     system("rm -rf server_storage"); // clear out old results
     system("rm -rf client_storage"); // clear out old results
     test_append(tests, "engine.normal", normal_test);
+    test_append(tests, "engine.bad_sender", bad_sender_test);
 }

@@ -173,6 +173,37 @@ handle_logout(ofixErr err, ofixSession session, ofixMsg msg) {
     session->logout_sent = dtime();
 }
 
+static void
+send_reject(ofixErr err,
+	    ofixSession session,
+	    int64_t seq,
+	    const char *msg_type,
+	    int64_t tag,
+	    int64_t reason,
+	    const char *text) {
+    ofixMsg	msg = ofix_session_create_msg(err, session, "3");
+
+    if (NULL == msg) {
+	return;
+    }
+    ofix_msg_set_int(err, msg, OFIX_RefSeqNumTAG, seq);
+    if (NULL != msg_type) {
+	ofix_msg_set_str(err, msg, OFIX_RefMsgTypeTAG, msg_type);
+    }
+    if (0 <= tag) {
+	ofix_msg_set_int(err, msg, OFIX_RefTagIDTAG, tag);
+    }
+    if (0 <= reason) {
+	ofix_msg_set_int(err, msg, OFIX_SessionRejectReasonTAG, reason);
+    }
+    if (NULL != text) {
+	ofix_msg_set_str(err, msg, OFIX_TextTAG, text);
+    }
+
+    ofix_session_send(err, session, msg);
+}
+
+
 static bool
 handle_session_msg(ofixErr err, ofixSession session, const char *mt, ofixMsg msg) {
     if ('\0' != mt[1]) {
@@ -183,9 +214,14 @@ handle_session_msg(ofixErr err, ofixSession session, const char *mt, ofixMsg msg
 	handle_logon(err, session, msg);
 	break;
     case '0': // Heartbeat
+	return false;
     case '1': // TestRequest
+	return false;
     case '2': // ResendRequest
+	return false;
     case '3': // Reject
+	session->recv_cb(session, msg, session->recv_ctx);
+	break;
     case '4': // SequenceReset
 	return false;
     case '5': // Logout
@@ -310,11 +346,18 @@ session_loop(void *arg) {
 		ofix_store_add(&err, session->store, seq, OFIX_IODIR_RECV, msg);
 		if (NULL == mt) {
 		    session->log(session->log_ctx, OFIX_WARN, "Invalid message. No MsgType field.");
+		    // TBD send reject
 		} else if (NULL == sid || 0 != strcmp(session->tid, sid)) {
+		    char	err_buf[1024];
+
+		    snprintf(err_buf, sizeof(err_buf), "Expected sender of '%s'. Received '%s'.",
+			     session->tid, (NULL == sid ? "<null>" : sid));
+
 		    session->log(session->log_ctx, OFIX_WARN,
 				 "Expected sender of '%s'. Received '%s'. Logging out.",
 				 session->tid, (NULL == sid ? "<null>" : sid));
 		    session->recv_seq = seq;
+		    send_reject(&err, session, seq, mt, OFIX_SenderCompIDTAG, 5, err_buf);
 		    ofix_session_logout(&err, session, "Expected sender of '%s'. Received '%s'.",
 					session->tid, (NULL == sid ? "<null>" : sid));
 		} else if (session->recv_seq == seq) {
@@ -421,6 +464,39 @@ ofix_session_send(ofixErr err, ofixSession session, ofixMsg msg) {
     ofix_store_add(err, session->store, seq, OFIX_IODIR_SEND, msg);
 }
 
+// only used for testing bad messages
+void
+_ofix_session_raw_send(ofixErr err, ofixSession session, ofixMsg msg) {
+    int			cnt;
+    const char		*str;
+    struct timeval	tv;
+    struct timezone	tz;
+    struct _ofixDate	now;
+    int64_t		seq;
+
+    if (NULL != err && OFIX_OK != err->code) {
+	return;
+    }
+    gettimeofday(&tv, &tz);
+    ofix_date_set_timestamp(&now, (uint64_t)tv.tv_sec * 1000000LL + (uint64_t)tv.tv_usec);
+    ofix_msg_set_date(err, msg, OFIX_SendingTimeTAG, &now);
+
+    pthread_mutex_lock(&session->send_mutex);
+    session->sent_seq++;
+    seq = ofix_msg_get_int(err, msg, OFIX_MsgSeqNumTAG);
+    cnt = ofix_msg_size(err, msg);
+    str = ofix_msg_FIX_str(err, msg);
+    if (cnt != send(session->sock, str, cnt, 0)) {
+	if (NULL != err) {
+	    err->code = OFIX_WRITE_ERR;
+	    snprintf(err->msg, sizeof(err->msg),
+		     "Failed to send message. error [%d] %s", errno, strerror(errno));
+	}
+    }
+    pthread_mutex_unlock(&session->send_mutex);
+    ofix_store_add(err, session->store, seq, OFIX_IODIR_SEND, msg);
+}
+
 ofixMsg
 ofix_session_get_msg(ofixErr err, ofixSession session, int64_t seqnum) {
     // TBD
@@ -439,9 +515,13 @@ ofix_session_recv_seqnum(ofixSession session) {
 
 void
 ofix_session_logout(ofixErr err, ofixSession session, const char *txt, ...) {
-    ofixMsg	msg = ofix_session_create_msg(err, session, "5");
+    ofixMsg	msg;
 
-    if (NULL == msg) {
+    if (0.0 < session->logout_sent) {
+	session->done = true;
+	return;
+    }
+    if (NULL == (msg = ofix_session_create_msg(err, session, "5"))) {
 	return;
     }
     if (NULL != txt) {

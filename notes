@@ -4,20 +4,36 @@
 ^c^s show subtree
 
 - engine
- - complete normal test
-  - read and compare files
+ - Reject
+  - bad seq num
+  - bad target
+  - no msgtype or other missing fields
+  - duplicate or out of order message
+
+ - allow duplicate seq if pos-resend it true
+
+ - tolerant option
+  - allow out of order tags
+  - allow additional tags
+
  - Heartbeat
+  - test
+   - set hearbeat to 2 and run for 5 seconds recording log
+    - might have to use 2 on client and 3 on server or something to get interleaving correct
  - TestRequest
  - ResendRequest
- - Reject
  - SequenceReset
 
  - server FIX version select on recv 
 
  - tests
-  - normal (logon, send, receive, logout)
+  - reject
+   - 
   - heartbeats
   - test request
   - resend
   - seq reset
   - rejects (various reasons)
+
+- validate
+ - implement validation for tag order

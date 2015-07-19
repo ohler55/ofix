@@ -51,5 +51,6 @@ extern void	_ofix_session_free(ofixSession session);
 extern void	_ofix_session_start(ofixErr err, ofixSession session, bool wait);
 
 extern uint32_t	_ofix_net_addr(ofixErr err, const char *host);
+extern void	_ofix_session_raw_send(ofixErr err, ofixSession session, ofixMsg msg);
 
 #endif /* __OFIX_PRIVATE_H__ */
