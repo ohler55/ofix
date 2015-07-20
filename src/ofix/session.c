@@ -319,8 +319,13 @@ session_loop(void *arg) {
 		struct _ofixErr	rerr = OFIX_ERR_INIT;
 		
 		session->log(session->log_ctx, OFIX_WARN, "Parse error: %s", err.msg);
-		send_reject(&rerr, session, session->recv_seq + 1, err.msg_type, err.tag, err.reason, err.msg);
-		ofix_session_logout(&rerr, session, "%s", err.msg);
+		send_reject(&rerr, session, (0 == err.seq ? session->recv_seq + 1: err.seq),
+			    err.msg_type, err.tag, err.reason, err.msg);
+		if (0 != err.seq) {
+		    session->recv_seq = err.seq;
+		} else {
+		    session->recv_seq++;
+		}
 	    } else {
 		int64_t		seq = ofix_msg_get_int(&err, msg, OFIX_MsgSeqNumTAG);
 		const char	*mt = ofix_msg_get_str(&err, msg, OFIX_MsgTypeTAG);
@@ -348,12 +353,7 @@ session_loop(void *arg) {
 		    session->store = ofix_store_create(&err, path, session->tid);
 		}
 		ofix_store_add(&err, session->store, seq, OFIX_IODIR_RECV, msg);
-		if (NULL == mt) {
-		    session->log(session->log_ctx, OFIX_WARN, "Invalid message. Missing MsgType field.");
-		    send_reject(&err, session, seq, NULL, OFIX_MsgTypeTAG, OFIX_REASON_MISSING_TAG,
-				"Missing MsgType field");
-		    ofix_session_logout(&err, session, "Invalid message. Missing MsgType field");
-		} else if (NULL == sid || 0 != strcmp(session->tid, sid)) {
+		if (NULL == sid || 0 != strcmp(session->tid, sid)) {
 		    char	err_buf[1024];
 
 		    snprintf(err_buf, sizeof(err_buf), "Expected sender of '%s'. Received '%s'.",
@@ -362,7 +362,7 @@ session_loop(void *arg) {
 		    session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
 		    session->recv_seq = seq;
 		    send_reject(&err, session, seq, mt, OFIX_SenderCompIDTAG, OFIX_REASON_COMP_ID, err_buf);
-		    ofix_session_logout(&err, session, "%s", err_buf);
+		    //ofix_session_logout(&err, session, "%s", err_buf);
 		} else if (NULL == tid || 0 != strcmp(session->sid, tid)) {
 		    char	err_buf[1024];
 
@@ -371,11 +371,22 @@ session_loop(void *arg) {
 		    session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
 		    session->recv_seq = seq;
 		    send_reject(&err, session, seq, mt, OFIX_TargetCompIDTAG, OFIX_REASON_COMP_ID, err_buf);
-		    ofix_session_logout(&err, session, "%s", err_buf);
-		} else if (session->recv_seq == seq) {
-		    session->log(session->log_ctx, OFIX_WARN,
-				 "Duplicate message  from '%s'.", session->tid);
-		    // TBD check dup flag if the same
+		    //ofix_session_logout(&err, session, "%s", err_buf);
+		} else if (session->recv_seq >= seq) {
+		    struct _ofixErr	derr = OFIX_ERR_INIT;
+		    bool		dup = ofix_msg_get_bool(&derr, msg, OFIX_PossDupFlagTAG);
+		    char		err_buf[1024];
+
+		    snprintf(err_buf, sizeof(err_buf),
+			     "Duplicate message %lld from '%s' not flagged as duplicate.",
+			     (long long)seq, (NULL == tid ? "<null>" : tid));
+		    session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
+		    if (OFIX_OK != derr.code || !dup) {
+			send_reject(&err, session, seq, mt, OFIX_MsgSeqNumTAG, OFIX_REASON_OTHER, err_buf);
+			ofix_session_logout(&err, session, "%s", err_buf);
+		    } else {
+			keep = !session->recv_cb(session, msg, session->recv_ctx);
+		    }
 		} else if (session->recv_seq + 1 != seq) {
 		    session->log(session->log_ctx, OFIX_WARN,
 				 "'%s' did not send the correct sequence number.", session->tid);

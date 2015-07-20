@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-#define OFIX_ERR_INIT	{ 0, 0, 0, { 0 }, { 0 } }
+#define OFIX_ERR_INIT	{ 0, 0, 0, 0, { 0 }, { 0 } }
 
 /**
  * Error codes for the __code__ field in __ofixErr__ structs.
@@ -107,6 +107,8 @@ typedef struct _ofixErr {
     int		reason;
     /** Tag associated with the error or 0 if not tag associated with the error. */
     int		tag;
+    /** sequence number of the message if known otherwise 0 */
+    int64_t	seq;
     /** message type associated with the error or empty if unknown. */
     char	msg_type[8];
     /** Error message associated with a failure if the code is not __OFIX_OK__. */
@@ -117,6 +119,7 @@ static inline void ofix_err_clear(ofixErr err) {
     err->code = OFIX_OK;
     err->reason = OFIX_REASON_NONE;
     err->tag = 0;
+    err->seq = 0;
     *err->msg_type = '\0';
     *err->msg = '\0';
 }

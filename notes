@@ -5,11 +5,16 @@
 
 - engine
  - Reject
+  - try to stay connected, don't log out
   - bad seq num
-   - allow duplicate seq if pos-resend it true
-   - other wise reject but do not logout (or let app handle?)
+   - if past seq received with no dup reject and logout
+   - allow duplicate seq if possible-resend is true
+
    - seq is before (same as dup but always reject?)
    - after then request resend
+
+ - logon
+  - use file with logon data in it
 
  - tolerant option
   - allow out of order tags

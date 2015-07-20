@@ -337,7 +337,7 @@ bad_sender_test() {
     msgs[0] = msg1;
     msgs[1] = NULL;
 
-    run_test(msgs, true, 3, 6162);
+    run_test(msgs, true, 2, 6162);
 
     actual = load_fix_file(client_storage);
     test_same("sender: Client\n\
@@ -346,8 +346,8 @@ bad_sender_test() {
 8=FIX.4.4^9=067^35=A^49=Server^56=Client^34=1^52=$-$:$:$.$^98=0^108=30^10=$^\n\
 8=FIX.4.4^9=114^35=D^49=Bad^56=Server^34=2^52=$-$:$:$.$^11=order-123^55=IBM^54=1^60=$-$:$:$.$^38=250^40=1^10=$^\n\
 8=FIX.4.4^9=127^35=3^49=Server^56=Client^34=2^52=$-$:$:$.$^45=2^371=49^372=D^373=9^58=Expected sender of 'Client'. Received 'Bad'.^10=$^\n\
-8=FIX.4.4^9=103^35=5^49=Server^56=Client^34=3^52=$-$:$:$.$^58=Expected sender of 'Client'. Received 'Bad'.^10=$^\n\
-8=FIX.4.4^9=055^35=5^49=Client^56=Server^34=3^52=$-$:$:$.$^10=$^\n",
+8=FIX.4.4^9=066^35=5^49=Client^56=Server^34=3^52=$-$:$:$.$^58=bye bye^10=$^\n\
+8=FIX.4.4^9=055^35=5^49=Server^56=Client^34=3^52=$-$:$:$.$^10=$^\n",
 	      actual);
     free(actual);
 }
@@ -397,7 +397,7 @@ bad_target_test() {
     msgs[0] = msg1;
     msgs[1] = NULL;
 
-    run_test(msgs, true, 3, 6163);
+    run_test(msgs, true, 2, 6163);
 
     actual = load_fix_file(client_storage);
     test_same("sender: Client\n\
@@ -406,8 +406,8 @@ bad_target_test() {
 8=FIX.4.4^9=067^35=A^49=Server^56=Client^34=1^52=$-$:$:$.$^98=0^108=30^10=$^\n\
 8=FIX.4.4^9=114^35=D^49=Client^56=Bad^34=2^52=$-$:$:$.$^11=order-123^55=IBM^54=1^60=$-$:$:$.$^38=250^40=1^10=$^\n\
 8=FIX.4.4^9=127^35=3^49=Server^56=Client^34=2^52=$-$:$:$.$^45=2^371=56^372=D^373=9^58=Expected target of 'Server'. Received 'Bad'.^10=$^\n\
-8=FIX.4.4^9=103^35=5^49=Server^56=Client^34=3^52=$-$:$:$.$^58=Expected target of 'Server'. Received 'Bad'.^10=$^\n\
-8=FIX.4.4^9=055^35=5^49=Client^56=Server^34=3^52=$-$:$:$.$^10=$^\n",
+8=FIX.4.4^9=066^35=5^49=Client^56=Server^34=3^52=$-$:$:$.$^58=bye bye^10=$^\n\
+8=FIX.4.4^9=055^35=5^49=Server^56=Client^34=3^52=$-$:$:$.$^10=$^\n",
 	      actual);
     free(actual);
 }
@@ -458,7 +458,7 @@ bad_msgtype_test() {
     msgs[0] = msg1;
     msgs[1] = NULL;
 
-    run_test(msgs, true, 3, 6164);
+    run_test(msgs, true, 2, 6164);
 
     actual = load_fix_file(client_storage);
     test_same("sender: Client\n\
@@ -467,8 +467,71 @@ bad_msgtype_test() {
 8=FIX.4.4^9=067^35=A^49=Server^56=Client^34=1^52=$-$:$:$.$^98=0^108=30^10=$^\n\
 8=FIX.4.4^9=119^35=BAD^49=Client^56=Server^34=2^52=$-$:$:$.$^11=order-123^55=IBM^54=1^60=$-$:$:$.$^38=250^40=1^10=$^\n\
 8=FIX.4.4^9=120^35=3^49=Server^56=Client^34=2^52=$-$:$:$.$^45=2^373=0^58=FIX specification for BAD in version 4.4 not found^10=$^\n\
-8=FIX.4.4^9=109^35=5^49=Server^56=Client^34=3^52=$-$:$:$.$^58=FIX specification for BAD in version 4.4 not found^10=$^\n\
-8=FIX.4.4^9=055^35=5^49=Client^56=Server^34=3^52=$-$:$:$.$^10=$^\n",
+8=FIX.4.4^9=066^35=5^49=Client^56=Server^34=3^52=$-$:$:$.$^58=bye bye^10=$^\n\
+8=FIX.4.4^9=055^35=5^49=Server^56=Client^34=3^52=$-$:$:$.$^10=$^\n",
+	      actual);
+    free(actual);
+}
+
+static void
+bad_dup_test() {
+    struct _ofixErr	err = OFIX_ERR_INIT;
+    ofixMsgSpec		spec = ofix_version_spec_get_msg_spec(&err, "D", 4, 4);
+    ofixMsg		msg1;
+    ofixMsg		msgs[3];
+    struct timeval	tv;
+    struct timezone	tz;
+    struct _ofixDate	now;
+    char		*actual;
+
+    gettimeofday(&tv, &tz);
+    ofix_date_set_timestamp(&now, (uint64_t)tv.tv_sec * 1000000LL + (uint64_t)tv.tv_usec);
+    
+    // Create an single order message.
+    // First get the message spec.
+    if (OFIX_OK != err.code || NULL == spec) {
+	test_print("Failed to find message spec for 'D' [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
+    msg1 = ofix_msg_create_from_spec(&err, spec, 16);
+    if (OFIX_OK != err.code || NULL == msg1) {
+	test_print("Failed to create message [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
+    ofix_msg_set_str(&err, msg1, OFIX_SenderCompIDTAG, "Client");
+    ofix_msg_set_str(&err, msg1, OFIX_TargetCompIDTAG, "Server");
+    ofix_msg_set_int(&err, msg1, OFIX_MsgSeqNumTAG, 2);
+
+    ofix_msg_set_str(&err, msg1, OFIX_ClOrdIDTAG, "order-123");
+    ofix_msg_set_str(&err, msg1, OFIX_SymbolTAG, "IBM");
+    ofix_msg_set_char(&err, msg1, OFIX_SideTAG, '1'); // buy
+    ofix_msg_set_int(&err, msg1, OFIX_OrderQtyTAG, 250);
+    ofix_msg_set_date(&err, msg1, OFIX_TransactTimeTAG, &now);
+    ofix_msg_set_char(&err, msg1, OFIX_OrdTypeTAG, '1'); // market order
+    if (OFIX_OK != err.code) {
+	test_print("Error while setting fields in message [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
+    msgs[0] = msg1;
+    msgs[1] = msg1;
+    msgs[2] = NULL;
+
+    run_test(msgs, true, 4, 6165);
+
+    actual = load_fix_file(client_storage);
+    test_same("sender: Client\n\
+\n\
+8=FIX.4.4^9=073^35=A^49=Client^56=Server^34=1^52=$-$:$:$.$^98=0^108=30^141=Y^10=$^\n\
+8=FIX.4.4^9=067^35=A^49=Server^56=Client^34=1^52=$-$:$:$.$^98=0^108=30^10=$^\n\
+8=FIX.4.4^9=117^35=D^49=Client^56=Server^34=2^52=$-$:$:$.$^11=order-123^55=IBM^54=1^60=$-$:$:$.$^38=250^40=1^10=$^\n\
+8=FIX.4.4^9=117^35=D^49=Client^56=Server^34=2^52=$-$:$:$.$^11=order-123^55=IBM^54=1^60=$-$:$:$.$^38=250^40=1^10=$^\n\
+8=FIX.4.4^9=117^35=8^49=Server^56=Client^34=2^52=$-$:$:$.$^37=order-123^17=x-1^150=0^39=0^55=IBM^54=1^151=250^14=250^6=0^10=$^\n\
+8=FIX.4.4^9=143^35=3^49=Server^56=Client^34=3^52=$-$:$:$.$^45=2^371=34^372=D^373=99^58=Duplicate message 2 from 'Server' not flagged as duplicate.^10=$^\n\
+8=FIX.4.4^9=118^35=5^49=Server^56=Client^34=4^52=$-$:$:$.$^58=Duplicate message 2 from 'Server' not flagged as duplicate.^10=$^\n\
+8=FIX.4.4^9=055^35=5^49=Client^56=Server^34=4^52=$-$:$:$.$^10=$^\n",
 	      actual);
     free(actual);
 }
@@ -479,5 +542,7 @@ append_engine_tests(Test tests) {
     test_append(tests, "engine.bad_sender", bad_sender_test);
     test_append(tests, "engine.bad_target", bad_target_test);
     test_append(tests, "engine.bad_msgtype", bad_msgtype_test);
+    test_append(tests, "engine.bad_dup", bad_dup_test);
+
     // TBD seq number errors, duplicate with and without pos dup, out of sequence in past and future
 }
