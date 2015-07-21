@@ -362,7 +362,6 @@ session_loop(void *arg) {
 		    session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
 		    session->recv_seq = seq;
 		    send_reject(&err, session, seq, mt, OFIX_SenderCompIDTAG, OFIX_REASON_COMP_ID, err_buf);
-		    //ofix_session_logout(&err, session, "%s", err_buf);
 		} else if (NULL == tid || 0 != strcmp(session->sid, tid)) {
 		    char	err_buf[1024];
 
@@ -371,29 +370,31 @@ session_loop(void *arg) {
 		    session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
 		    session->recv_seq = seq;
 		    send_reject(&err, session, seq, mt, OFIX_TargetCompIDTAG, OFIX_REASON_COMP_ID, err_buf);
-		    //ofix_session_logout(&err, session, "%s", err_buf);
 		} else if (session->recv_seq >= seq) {
 		    struct _ofixErr	derr = OFIX_ERR_INIT;
 		    bool		dup = ofix_msg_get_bool(&derr, msg, OFIX_PossDupFlagTAG);
-		    char		err_buf[1024];
 
-		    snprintf(err_buf, sizeof(err_buf),
-			     "Duplicate message %lld from '%s' not flagged as duplicate.",
-			     (long long)seq, (NULL == tid ? "<null>" : tid));
-		    session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
 		    if (OFIX_OK != derr.code || !dup) {
+			char	err_buf[1024];
+
+			snprintf(err_buf, sizeof(err_buf),
+				 "Duplicate message %lld from '%s' not flagged as duplicate.",
+				 (long long)seq, (NULL == tid ? "<null>" : tid));
+			session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
 			send_reject(&err, session, seq, mt, OFIX_MsgSeqNumTAG, OFIX_REASON_OTHER, err_buf);
 			ofix_session_logout(&err, session, "%s", err_buf);
-		    } else {
+		    } else if (handle_session_msg(&err, session, mt, msg)) {
+			session->recv_seq = seq;
+		    } else if (NULL != session->recv_cb) {
 			keep = !session->recv_cb(session, msg, session->recv_ctx);
 		    }
 		} else if (session->recv_seq + 1 != seq) {
 		    session->log(session->log_ctx, OFIX_WARN,
-				 "'%s' did not send the correct sequence number.", session->tid);
-		    // TBD if seq is not the next then error, try to recover
-		    ofix_session_logout(&err, session, 
-					"'%s' did not send the correct sequence number. Received %lld. Expected %lld.",
-					session->tid, (long long)seq, (long long)session->recv_seq + 1);
+				 "'%s' did not send the correct sequence number. Received %lld. Expected %lld.",
+				 session->tid, (long long)seq, (long long)session->recv_seq + 1);
+		    session->recv_seq = seq;
+		    keep = !session->recv_cb(session, msg, session->recv_ctx);
+		    // TBD queue the message and try to recover with resend request
 		} else if (handle_session_msg(&err, session, mt, msg)) {
 		    session->recv_seq = seq;
 		} else if (NULL != session->recv_cb) {
@@ -505,8 +506,8 @@ _ofix_session_raw_send(ofixErr err, ofixSession session, ofixMsg msg) {
     ofix_msg_set_date(err, msg, OFIX_SendingTimeTAG, &now);
 
     pthread_mutex_lock(&session->send_mutex);
-    session->sent_seq++;
     seq = ofix_msg_get_int(err, msg, OFIX_MsgSeqNumTAG);
+    session->sent_seq = seq;
     cnt = ofix_msg_size(err, msg);
     str = ofix_msg_FIX_str(err, msg);
     if (cnt != send(session->sock, str, cnt, 0)) {
@@ -558,4 +559,3 @@ ofix_session_logout(ofixErr err, ofixSession session, const char *txt, ...) {
     }
     ofix_session_send(err, session, msg);
 }
-

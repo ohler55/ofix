@@ -28,13 +28,22 @@ typedef struct _EngSession {
     struct _ofixSession	session;
 } *EngSession;
 
+typedef struct _Auth {
+    struct _Auth	*next;
+    // fields are part of auth_data of engine
+    char		*comp_id;
+    char		*user;
+    char		*password;
+} *Auth;
+
 struct _ofixEngine {
     char		*id;
     char		*ipaddr;
     int			port;
-    char		*auth_file;
     ofixVersionSpec	spec;
     char 		*store_dir;
+    char		*auth_data;
+    Auth		auths;
     int 		heartbeat_interval;
     bool		done;
     bool		closed;
@@ -124,6 +133,135 @@ session_destroy(ofixErr err, EngSession session) {
     }
 }
 
+static char*
+skip_space(char *s) {
+    for (; isspace(*s); s++) {
+	if ('\0' == *s) {
+	    return NULL;
+	}
+    }
+    return s;
+}
+
+static char*
+skip_comment(char *s) {
+    if ('#' != *s) {
+	return s;
+    }
+    for (; '\n' != *s; s++) {
+	if ('\0' == *s) {
+	    return NULL;
+	}
+    }
+    s++;
+    return s;
+}
+
+static Auth
+read_auth(char *s) {
+    Auth	auth;
+    char	*cid;
+    char	*u = NULL;
+    char	*p = NULL;
+
+    while (NULL != (s = skip_space(s)) &&
+	   NULL != (s = skip_comment(s))) {
+	if (!isspace(*s)) {
+	    break;
+	}
+    }
+    cid = s;
+    for (; ':' != *s; s++) {
+	// TBD check error
+	if ('\0' == *s || '\n' == *s) {
+	    return NULL;
+	}
+    }
+    *s++ = '\0';
+    for (; ' ' == *s; s++) {
+    }
+    u = s;
+    for (; '@' != *s; s++) {
+	// TBD check error
+	if ('\0' == *s || '\n' == *s) {
+	    return NULL;
+	}
+    }
+    *s++ = '\0';
+    p = s;
+    for (; '\n' != *s; s++) {
+	if ('\0' == *s) {
+	    return NULL;
+	}
+    }
+    *s++ = '\0';
+    if (NULL == (auth = (Auth)malloc(sizeof(struct _Auth)))) {
+	// TBD error
+	return NULL;
+    }
+    auth->next = NULL;
+    auth->comp_id = cid;
+    auth->user = u;
+    auth->password = p;
+
+    return auth;
+}
+
+// File format is one entry per line. Blank lines or lines that start with # are
+// ignored. The line format is <component id>:<user>@<password>
+static void
+load_auth(ofixErr err, ofixEngine eng, const char *filename) {
+    FILE	*f;
+    Auth	auth;
+    long	size;
+    char	*s;
+
+    if (NULL != err && OFIX_OK != err->code) {
+	return;
+    }
+    if (NULL == (f = fopen(filename, "r"))) {
+	if (NULL != err) {
+	    err->code = OFIX_READ_ERR;
+	    snprintf(err->msg, sizeof(err->msg), "Failed to open auth file '%s'. %s",
+		     filename, strerror(errno));
+	}
+	return;
+    }
+    if (0 > fseek(f, 0, SEEK_END) || 0 > (size = ftell(f)) || 0 > fseek(f, 0, SEEK_SET)) {
+	if (NULL != err) {
+	    err->code = OFIX_READ_ERR;
+	    snprintf(err->msg, sizeof(err->msg), "Failed to read auth file '%s'. %s",
+		     filename, strerror(errno));
+	}
+	fclose(f);
+	return;
+    }
+    if (NULL == (eng->auth_data = (char*)malloc(size + 1))) {
+	if (NULL != err) {
+	    err->code = OFIX_MEMORY_ERR;
+	    snprintf(err->msg, sizeof(err->msg), "Failed to allocate memory for file '%s'.", filename);
+	}
+	fclose(f);
+	return;
+    }
+    if (size != fread(eng->auth_data, 1, size, f)) {
+	if (NULL != err) {
+	    err->code = OFIX_READ_ERR;
+	    snprintf(err->msg, sizeof(err->msg), "Failed to read auth file '%s'. %s",
+		     filename, strerror(errno));
+	}
+	fclose(f);
+	return;
+    }
+    eng->auth_data[size] = '\0';
+    s = eng->auth_data;
+    while (NULL != (auth = read_auth(s))) {
+	auth->next = eng->auths;
+	eng->auths = auth;
+    }
+    fclose(f);
+}
+
 ofixEngine
 ofix_engine_create(ofixErr err,
 		   const char *id,
@@ -170,10 +308,10 @@ ofix_engine_create(ofixErr err,
     eng->log_on = log_on;
     eng->log = log;
     eng->log_ctx = NULL;
-    if (NULL == auth_file) {
-	eng->auth_file = NULL;
-    } else {
-	eng->auth_file = strdup(auth_file);
+    eng->auth_data = NULL;
+    eng->auths = NULL;
+    if (NULL != auth_file) {
+	load_auth(err, eng, auth_file);
     }
     if (NULL == store_dir) {
 	eng->store_dir = strdup(".");
@@ -202,6 +340,7 @@ ofix_engine_destroy(ofixErr err, ofixEngine eng) {
 	EngSession	sessions;
 	EngSession	es;
 	double		give_up;
+	Auth		auth;
 
 	pthread_mutex_lock(&eng->session_mutex);
 	sessions = eng->sessions;
@@ -219,8 +358,12 @@ ofix_engine_destroy(ofixErr err, ofixEngine eng) {
 	}
 	free(eng->id);
 	free(eng->ipaddr);
-	free(eng->auth_file);
 	free(eng->store_dir);
+	while (NULL != (auth = eng->auths)) {
+	    eng->auths = eng->auths->next;
+	    free(auth);
+	}
+	free(eng->auth_data);
 	free(eng);
     }
 }
@@ -244,11 +387,6 @@ ofix_engine_id(ofixEngine eng) {
 const char*
 ofix_engine_ipaddr(ofixEngine eng) {
     return eng->ipaddr;
-}
-
-const char*
-ofix_engine_auth_file(ofixEngine eng) {
-    return eng->auth_file;
 }
 
 const char*

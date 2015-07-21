@@ -39,7 +39,6 @@ extern ofixEngine	ofix_engine_create(ofixErr err,
 extern void		ofix_engine_on_recv(ofixEngine eng, ofixRecvCallback cb, void *ctx);
 extern const char*	ofix_engine_id(ofixEngine eng);
 extern const char*	ofix_engine_ipaddr(ofixEngine eng);
-extern const char*	ofix_engine_auth_file(ofixEngine eng);
 extern const char*	ofix_engine_store_dir(ofixEngine eng);
 extern int		ofix_engine_heartbeat_interval(ofixEngine eng);
 extern int		ofix_engine_port(ofixEngine eng);
