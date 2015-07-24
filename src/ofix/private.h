@@ -13,6 +13,7 @@
 #define LOGOUT_TIMEOUT	2.0
 
 struct _ofixSession {
+    struct _ofixEngine	*eng; // set to NULL if a client
     char		*sid; // sender ID
     char		*tid; // target ID
     ofixVersionSpec	spec;

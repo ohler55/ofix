@@ -62,6 +62,7 @@ _ofix_session_init(ofixErr err,
 	snprintf(s->version_str, sizeof(s->version_str), "FIX.%d.%d", spec->major, spec->minor);
 	s->version_str[sizeof(s->version_str) - 1] = '\0';
     }
+    s->eng = NULL;
     s->sent_seq = 0;
     s->recv_seq = 0;
     s->sock = 0;
@@ -130,18 +131,70 @@ ofix_session_create_msg(ofixErr err, ofixSession session, const char *type) {
 }
 
 static void
-handle_logon(ofixErr err, ofixSession session, ofixMsg msg) {
-    const char	*s = ofix_msg_get_str(err, msg, OFIX_BeginStringTAG);
+send_reject(ofixErr err,
+	    ofixSession session,
+	    int64_t seq,
+	    const char *msg_type,
+	    int64_t tag,
+	    int64_t reason,
+	    const char *text) {
+    ofixMsg	msg = ofix_session_create_msg(err, session, "3");
 
-    if (NULL == s || 0 != strcmp(session->version_str, s)) {
-	ofix_session_logout(err, session, "Wrong FIX version. Expected %s. Recieved %s.", session->version_str, s);
+    if (NULL == msg) {
+	return;
+    }
+    ofix_msg_set_int(err, msg, OFIX_RefSeqNumTAG, seq);
+    if (NULL != msg_type && '\0' != *msg_type) {
+	ofix_msg_set_str(err, msg, OFIX_RefMsgTypeTAG, msg_type);
+    }
+    if (0 < tag) {
+	ofix_msg_set_int(err, msg, OFIX_RefTagIDTAG, tag);
+    }
+    if (0 <= reason) {
+	ofix_msg_set_int(err, msg, OFIX_SessionRejectReasonTAG, reason);
+    }
+    if (NULL != text && '\0' != *text) {
+	ofix_msg_set_str(err, msg, OFIX_TextTAG, text);
+    }
+    ofix_session_send(err, session, msg);
+}
+
+static void
+handle_logon(ofixErr err, ofixSession session, ofixMsg msg) {
+    char		buf[16]; // longer than 32 is an error
+    char		*user;
+    char		*password;
+
+    ofix_msg_copy_str(err, msg, OFIX_BeginStringTAG, buf, sizeof(buf));
+    if (0 != strcmp(session->version_str, buf)) {
+	char		err_msg[256];
+	struct _ofixErr	ignore = OFIX_ERR_INIT;
+
+	snprintf(err_msg, sizeof(err_msg),
+		 "Wrong FIX version. Expected %s. Recieved %s.", session->version_str, buf);
+	send_reject(&ignore, session, 0, "A", OFIX_EncryptMethodTAG, OFIX_REASON_BAD_VALUE, err_msg);
+	ofix_session_logout(err, session, "%s", err_msg);
 	return;
     }
     if (0 != ofix_msg_get_int(err, msg, OFIX_EncryptMethodTAG)) {
+	struct _ofixErr	ignore = OFIX_ERR_INIT;
+
+	send_reject(&ignore, session, 0, "A", OFIX_EncryptMethodTAG, OFIX_REASON_DECRYPT,
+		    "Encryption is not supported.");
 	ofix_session_logout(err, session, "Encryption is not supported.");
+	return;
     }
-    
-    // TBD validate sender and user/password and logout it not accepted
+    user = ofix_msg_get_str(NULL, msg, OFIX_UsernameTAG);
+    password = ofix_msg_get_str(NULL, msg, OFIX_PasswordTAG);
+    if (NULL != session->eng &&
+	!ofix_engine_authorized(session->eng, session->tid, user, password)) {
+	struct _ofixErr	ignore = OFIX_ERR_INIT;
+
+	send_reject(&ignore, session, 0, "A", 0, OFIX_REASON_SIGNATURE, "Invalid credentials.");
+	ofix_session_logout(err, session, "Invalid credentials.");
+	return;
+    }
+
     // TBD verify sequence number (if there is some predefined start number)
     session->target_heartbeat_interval = (int)ofix_msg_get_int(err, msg, OFIX_HeartBtIntTAG);
     if (!session->logon_sent) {
@@ -174,37 +227,17 @@ handle_logout(ofixErr err, ofixSession session, ofixMsg msg) {
 }
 
 static void
-send_reject(ofixErr err,
-	    ofixSession session,
-	    int64_t seq,
-	    const char *msg_type,
-	    int64_t tag,
-	    int64_t reason,
-	    const char *text) {
-    ofixMsg	msg = ofix_session_create_msg(err, session, "3");
-
-    if (NULL == msg) {
-	return;
+handle_reject(ofixErr err, ofixSession session, ofixMsg msg) {
+    if (!session->logon_recv) {
+	session->logon_recv = true;
+	// logout is coming
+    } else {
+	session->recv_cb(session, msg, session->recv_ctx);
     }
-    ofix_msg_set_int(err, msg, OFIX_RefSeqNumTAG, seq);
-    if (NULL != msg_type && '\0' != *msg_type) {
-	ofix_msg_set_str(err, msg, OFIX_RefMsgTypeTAG, msg_type);
-    }
-    if (0 < tag) {
-	ofix_msg_set_int(err, msg, OFIX_RefTagIDTAG, tag);
-    }
-    if (0 <= reason) {
-	ofix_msg_set_int(err, msg, OFIX_SessionRejectReasonTAG, reason);
-    }
-    if (NULL != text && '\0' != *text) {
-	ofix_msg_set_str(err, msg, OFIX_TextTAG, text);
-    }
-    ofix_session_send(err, session, msg);
 }
 
-
 static bool
-handle_session_msg(ofixErr err, ofixSession session, const char *mt, ofixMsg msg) {
+handle_session_msg(ofixErr err, ofixSession session, const char *mt, ofixMsg msg, int64_t seq) {
     if ('\0' != mt[1]) {
 	return false;
     }
@@ -219,7 +252,7 @@ handle_session_msg(ofixErr err, ofixSession session, const char *mt, ofixMsg msg
     case '2': // ResendRequest
 	return false;
     case '3': // Reject
-	session->recv_cb(session, msg, session->recv_ctx);
+	handle_reject(err, session, msg);
 	break;
     case '4': // SequenceReset
 	return false;
@@ -227,8 +260,10 @@ handle_session_msg(ofixErr err, ofixSession session, const char *mt, ofixMsg msg
 	handle_logout(err, session, msg);
 	break;
     default:
+	session->recv_seq = seq;
 	return false;
     }
+    session->recv_seq = seq;
     return true;
 }
 
@@ -296,6 +331,10 @@ session_loop(void *arg) {
 		break;
 	    }
 	}
+	if (0.0 < session->logout_sent && session->logout_sent + 1.0 < dtime()) {
+	    session->done = true;
+	    break;
+	}
 	if (22 <= b - start && 0 == msg_len) {
 	    msg_len = ofix_msg_expected_buf_size(start);
 	    if (0 == msg_len) {
@@ -353,7 +392,11 @@ session_loop(void *arg) {
 		    session->store = ofix_store_create(&err, path, session->tid);
 		}
 		ofix_store_add(&err, session->store, seq, OFIX_IODIR_RECV, msg);
-		if (NULL == sid || 0 != strcmp(session->tid, sid)) {
+		if (0.0 < session->logout_sent) {
+		    if (0 == strcmp("5", mt)) {
+			handle_session_msg(&err, session, mt, msg, seq);
+		    }
+		} else if (NULL == sid || 0 != strcmp(session->tid, sid)) {
 		    char	err_buf[1024];
 
 		    snprintf(err_buf, sizeof(err_buf), "Expected sender of '%s'. Received '%s'.",
@@ -383,7 +426,7 @@ session_loop(void *arg) {
 			session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
 			send_reject(&err, session, seq, mt, OFIX_MsgSeqNumTAG, OFIX_REASON_OTHER, err_buf);
 			ofix_session_logout(&err, session, "%s", err_buf);
-		    } else if (handle_session_msg(&err, session, mt, msg)) {
+		    } else if (handle_session_msg(&err, session, mt, msg, seq)) {
 			session->recv_seq = seq;
 		    } else if (NULL != session->recv_cb) {
 			keep = !session->recv_cb(session, msg, session->recv_ctx);
@@ -395,7 +438,7 @@ session_loop(void *arg) {
 		    session->recv_seq = seq;
 		    keep = !session->recv_cb(session, msg, session->recv_ctx);
 		    // TBD queue the message and try to recover with resend request
-		} else if (handle_session_msg(&err, session, mt, msg)) {
+		} else if (handle_session_msg(&err, session, mt, msg, seq)) {
 		    session->recv_seq = seq;
 		} else if (NULL != session->recv_cb) {
 		    session->recv_seq = seq;

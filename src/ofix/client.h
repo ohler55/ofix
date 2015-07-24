@@ -32,6 +32,8 @@ extern ofixClient	ofix_client_create(ofixErr err,
 					   ofixVersionSpec spec,
 					   ofixRecvCallback cb, void *ctx);
 
+extern void		ofix_client_set_credentials(ofixClient client, const char *user, const char *password);
+
 /**
  *
  *

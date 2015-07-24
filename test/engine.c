@@ -22,6 +22,7 @@
 
 extern ofixVersionSpec	ofix_get_spec(ofixErr err, int major, int minor);
 extern void		_ofix_client_raw_send(ofixErr err, ofixClient client, ofixMsg msg);
+extern ofixSession	_ofix_client_get_session(ofixClient client);
 
 static const char	*client_storage = "client_storage.fix";
 
@@ -123,17 +124,19 @@ client_cb(ofixSession session, ofixMsg msg, void *ctx) {
     return true;
 }
 
-static void
-run_test(ofixMsg *msgs, bool raw, int server_seq, int port) {
-    struct _ofixErr	err = OFIX_ERR_INIT;
+static bool
+create_client_server(ofixErr err,
+		     ofixEngine *server,
+		     ofixClient *client,
+		     int port,
+		     const char *cid,
+		     const char *user,
+		     const char *password,
+		     int minor) {
     const char		*client_storage = "client_storage.fix";
-    ofixVersionSpec	vspec = ofix_get_spec(&err, 4, 4);
-    ofixEngine		server = ofix_engine_create(&err, "Server", port, NULL, "server_storage", vspec, 0);
+    ofixVersionSpec	vspec = ofix_get_spec(err, 4, 4);
+    ofixVersionSpec	cspec = ofix_get_spec(err, 4, minor);
     pthread_t		server_thread;
-    ofixClient		client;
-    ofixSession		server_session;
-    ofixMsgSpec		spec;
-    ofixMsg		msg;
     double		giveup;
     struct timeval	tv;
     struct timezone	tz;
@@ -142,67 +145,60 @@ run_test(ofixMsg *msgs, bool raw, int server_seq, int port) {
     gettimeofday(&tv, &tz);
     ofix_date_set_timestamp(&now, (uint64_t)tv.tv_sec * 1000000LL + (uint64_t)tv.tv_usec);
 
-    if (OFIX_OK != err.code || NULL == server) {
-	test_print("Failed to create server [%d] %s\n", err.code, err.msg);
+    *server = ofix_engine_create(err, "Server", port, "auth.txt", "server_storage", vspec, 0);
+    if (OFIX_OK != err->code || NULL == *server) {
+	test_print("Failed to create server [%d] %s\n", err->code, err->msg);
 	test_fail();
-	return;
+	return false;
     }
-    ofix_engine_on_recv(server, server_cb, NULL);
-    ofix_engine_set_log(server, log_on, log, stdout);
+    ofix_engine_on_recv(*server, server_cb, NULL);
+    ofix_engine_set_log(*server, log_on, log, stdout);
 
     // throw server into a separate thread
-    if (0 != pthread_create(&server_thread, 0, start_engine, server)) {
+    if (0 != pthread_create(&server_thread, 0, start_engine, *server)) {
 	test_print("failed to start engine thread\n");
 	test_fail();
-	return;
+	return false;
     }
 
-    client = ofix_client_create(&err, "Client", "Server", client_storage, vspec, client_cb, NULL);
-    if (OFIX_OK != err.code || NULL == client) {
-	test_print("Failed to create client [%d] %s\n", err.code, err.msg);
+    *client = ofix_client_create(err, cid, "Server", client_storage, cspec, client_cb, NULL);
+    if (OFIX_OK != err->code || NULL == *client) {
+	test_print("Failed to create client [%d] %s\n", err->code, err->msg);
 	test_fail();
-	return;
+	return false;
     }
-    ofix_client_set_log(client, log_on, log, stdout);
-
+    ofix_client_set_log(*client, log_on, log, stdout);
+    ofix_client_set_credentials(*client, user, password);
     // wait for engine to start
     giveup = dtime() + 1.0;
-    while (!ofix_engine_running(server)) {
+    while (!ofix_engine_running(*server)) {
 	if (giveup < dtime()) {
 	    test_print("Timed out waiting for engine to start.\n");
 	    test_fail();
-	    return;
+	    return false;
 	}
     }
 
-    ofix_client_connect(&err, client, "localhost", port, 1.0);
-    if (OFIX_OK != err.code) {
-	test_print("Connect failed [%d] %s\n", err.code, err.msg);
+    ofix_client_connect(err, *client, "localhost", port, 1.0);
+    if (OFIX_OK != err->code) {
+	test_print("Connect failed [%d] %s\n", err->code, err->msg);
 	test_fail();
+	return false;
+    }
+    return true;
+}
+
+static void
+run_test(ofixMsg *msgs, bool raw, int server_seq, int port) {
+    struct _ofixErr	err = OFIX_ERR_INIT;
+    ofixEngine		server;
+    ofixClient		client;
+    double		giveup;
+
+    if (!create_client_server(&err, &server, &client, port, "Client", NULL, NULL, 4)) {
 	return;
     }
-    
-    server_session = ofix_engine_get_session(&err, server, "Client");
-    if (OFIX_OK != err.code || NULL == server_session) {
-	test_print("Failed to find server session [%d] %s\n", err.code, err.msg);
-	test_fail();
-	return;
-    }
-    
-    // Create an single order message.
-    // First get the message spec.
-    spec = ofix_version_spec_get_msg_spec(&err, "D", 4, 4);
-    if (OFIX_OK != err.code || NULL == spec) {
-	test_print("Failed to find message spec for 'D' [%d] %s\n", err.code, err.msg);
-	test_fail();
-	return;
-    }
-    msg = ofix_msg_create_from_spec(&err, spec, 16);
-    if (OFIX_OK != err.code || NULL == msg) {
-	test_print("Failed to create message [%d] %s\n", err.code, err.msg);
-	test_fail();
-	return;
-    }
+
     for (; NULL != *msgs; msgs++) {
 	if (raw) {
 	    _ofix_client_raw_send(&err, client, *msgs);
@@ -219,6 +215,7 @@ run_test(ofixMsg *msgs, bool raw, int server_seq, int port) {
 	    test_fail();
 	    return;
 	}
+	dsleep(0.01);
     }
 
     ofix_client_logout(&err, client, "bye bye");
@@ -614,6 +611,214 @@ dup_test() {
     free(actual);
 }
 
+static void
+bad_comp_id_test() {
+    struct _ofixErr	err = OFIX_ERR_INIT;
+    ofixEngine		server;
+    ofixClient		client;
+    double		giveup;
+    char		*actual;
+
+    if (!create_client_server(&err, &server, &client, 6167, "Zooz", NULL, NULL, 4)) {
+	return;
+    }
+    // wait for exchanges to complete
+    giveup = dtime() + 1.0;
+    while (2 > ofix_client_recv_seqnum(client)) {
+	if (giveup < dtime()) {
+	    test_print("Timed out waiting for client to receive responses.\n");
+	    test_fail();
+	    return;
+	}
+	dsleep(0.01);
+    }
+    ofix_client_destroy(&err, client);
+    ofix_engine_destroy(&err, server);
+    actual = load_fix_file(client_storage);
+    test_same("sender: Zooz\n\
+\n\
+8=FIX.4.4^9=071^35=A^49=Zooz^56=Server^34=1^52=$-$:$:$.$^98=0^108=30^141=Y^10=$^\n\
+8=FIX.4.4^9=094^35=3^49=Server^56=Zooz^34=1^52=$-$:$:$.$^45=0^372=A^373=8^58=Invalid credentials.^10=$^\n\
+8=FIX.4.4^9=077^35=5^49=Server^56=Zooz^34=2^52=$-$:$:$.$^58=Invalid credentials.^10=$^\n\
+8=FIX.4.4^9=053^35=5^49=Zooz^56=Server^34=2^52=$-$:$:$.$^10=$^\n",
+	      actual);
+    free(actual);
+}
+
+static void
+bad_fix_test() {
+    struct _ofixErr	err = OFIX_ERR_INIT;
+    ofixEngine		server;
+    ofixClient		client;
+    double		giveup;
+    char		*actual;
+
+    if (!create_client_server(&err, &server, &client, 6168, "Acme", "fred", "secret", 2)) {
+	return;
+    }
+    // wait for exchanges to complete
+    giveup = dtime() + 1.0;
+    while (2 > ofix_client_recv_seqnum(client)) {
+	if (giveup < dtime()) {
+	    test_print("Timed out waiting for client to receive responses.\n");
+	    test_fail();
+	    return;
+	}
+	dsleep(0.01);
+    }
+    ofix_client_destroy(&err, client);
+    ofix_engine_destroy(&err, server);
+    actual = load_fix_file(client_storage);
+    test_same("sender: Acme\n\
+\n\
+8=FIX.4.2^9=091^35=A^49=Acme^56=Server^34=1^52=$-$:$:$.$^98=0^108=30^141=Y^553=fred^554=secret^10=$^\n\
+8=FIX.4.4^9=135^35=3^49=Server^56=Acme^34=1^52=$-$:$:$.$^45=0^371=98^372=A^373=5^58=Wrong FIX version. Expected FIX.4.4. Recieved FIX.4.2.^10=$^\n\
+8=FIX.4.4^9=111^35=5^49=Server^56=Acme^34=2^52=$-$:$:$.$^58=Wrong FIX version. Expected FIX.4.4. Recieved FIX.4.2.^10=$^\n\
+8=FIX.4.2^9=053^35=5^49=Acme^56=Server^34=2^52=$-$:$:$.$^10=$^\n",
+	      actual);
+    free(actual);
+}
+
+static void
+bad_user_test() {
+    struct _ofixErr	err = OFIX_ERR_INIT;
+    ofixEngine		server;
+    ofixClient		client;
+    double		giveup;
+    char		*actual;
+
+    if (!create_client_server(&err, &server, &client, 6169, "Acme", "wilma", "secret", 4)) {
+	return;
+    }
+    // wait for exchanges to complete
+    giveup = dtime() + 1.0;
+    while (2 > ofix_client_recv_seqnum(client)) {
+	if (giveup < dtime()) {
+	    test_print("Timed out waiting for client to receive responses.\n");
+	    test_fail();
+	    return;
+	}
+	dsleep(0.01);
+    }
+    ofix_client_destroy(&err, client);
+    ofix_engine_destroy(&err, server);
+    actual = load_fix_file(client_storage);
+    test_same("sender: Acme\n\
+\n\
+8=FIX.4.4^9=092^35=A^49=Acme^56=Server^34=1^52=$-$:$:$.$^98=0^108=30^141=Y^553=wilma^554=secret^10=$^\n\
+8=FIX.4.4^9=094^35=3^49=Server^56=Acme^34=1^52=$-$:$:$.$^45=0^372=A^373=8^58=Invalid credentials.^10=$^\n\
+8=FIX.4.4^9=077^35=5^49=Server^56=Acme^34=2^52=$-$:$:$.$^58=Invalid credentials.^10=$^\n\
+8=FIX.4.4^9=053^35=5^49=Acme^56=Server^34=2^52=$-$:$:$.$^10=$^\n",
+	      actual);
+    free(actual);
+}
+
+static void
+bad_password_test() {
+    struct _ofixErr	err = OFIX_ERR_INIT;
+    ofixEngine		server;
+    ofixClient		client;
+    double		giveup;
+    char		*actual;
+
+    if (!create_client_server(&err, &server, &client, 6170, "Acme", "fred", "password", 4)) {
+	return;
+    }
+    // wait for exchanges to complete
+    giveup = dtime() + 1.0;
+    while (2 > ofix_client_recv_seqnum(client)) {
+	if (giveup < dtime()) {
+	    test_print("Timed out waiting for client to receive responses.\n");
+	    test_fail();
+	    return;
+	}
+	dsleep(0.01);
+    }
+    ofix_client_destroy(&err, client);
+    ofix_engine_destroy(&err, server);
+    actual = load_fix_file(client_storage);
+    test_same("sender: Acme\n\
+\n\
+8=FIX.4.4^9=093^35=A^49=Acme^56=Server^34=1^52=$-$:$:$.$^98=0^108=30^141=Y^553=fred^554=password^10=$^\n\
+8=FIX.4.4^9=094^35=3^49=Server^56=Acme^34=1^52=$-$:$:$.$^45=0^372=A^373=8^58=Invalid credentials.^10=$^\n\
+8=FIX.4.4^9=077^35=5^49=Server^56=Acme^34=2^52=$-$:$:$.$^58=Invalid credentials.^10=$^\n\
+8=FIX.4.4^9=053^35=5^49=Acme^56=Server^34=2^52=$-$:$:$.$^10=$^\n",
+	      actual);
+    free(actual);
+}
+
+static void
+after_logout_test() {
+    struct _ofixErr	err = OFIX_ERR_INIT;
+    ofixEngine		server;
+    ofixClient		client;
+    double		giveup;
+    char		*actual;
+    ofixMsgSpec		spec = ofix_version_spec_get_msg_spec(&err, "D", 4, 4);
+    ofixMsg		msg = ofix_msg_create_from_spec(&err, spec, 16);
+    struct timeval	tv;
+    struct timezone	tz;
+    struct _ofixDate	now;
+
+    gettimeofday(&tv, &tz);
+    ofix_date_set_timestamp(&now, (uint64_t)tv.tv_sec * 1000000LL + (uint64_t)tv.tv_usec);
+    if (OFIX_OK != err.code || NULL == msg) {
+	test_print("Failed to create message [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
+    ofix_msg_set_str(&err, msg, OFIX_ClOrdIDTAG, "order-123");
+    ofix_msg_set_str(&err, msg, OFIX_SymbolTAG, "IBM");
+    ofix_msg_set_char(&err, msg, OFIX_SideTAG, '1'); // buy
+    ofix_msg_set_int(&err, msg, OFIX_OrderQtyTAG, 250);
+    ofix_msg_set_date(&err, msg, OFIX_TransactTimeTAG, &now);
+    ofix_msg_set_char(&err, msg, OFIX_OrdTypeTAG, '1'); // market order
+    if (OFIX_OK != err.code) {
+	test_print("Error while setting fields in message [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
+
+    if (!create_client_server(&err, &server, &client, 6171, "Acme", "fred", "secret", 4)) {
+	return;
+    }
+    // wait for exchanges to complete
+    giveup = dtime() + 1.0;
+    while (1 > ofix_client_recv_seqnum(client)) {
+	if (giveup < dtime()) {
+	    test_print("Timed out waiting for client to receive logon response.\n");
+	    test_fail();
+	    return;
+	}
+	dsleep(0.01);
+    }
+    // Use session logout so client does not wait for a response.
+    ofix_session_logout(&err, _ofix_client_get_session(client), "bye bye");
+    ofix_client_send(&err, client, msg);
+
+    giveup = dtime() + 1.0;
+    while (2 > ofix_client_recv_seqnum(client)) {
+	if (giveup < dtime()) {
+	    test_print("Timed out waiting for client to receive logout response.\n");
+	    test_fail();
+	    return;
+	}
+	dsleep(0.01);
+    }
+    ofix_client_destroy(&err, client);
+    ofix_engine_destroy(&err, server);
+    actual = load_fix_file(client_storage);
+    test_same("sender: Acme\n\
+\n\
+8=FIX.4.4^9=091^35=A^49=Acme^56=Server^34=1^52=$-$:$:$.$^98=0^108=30^141=Y^553=fred^554=secret^10=$^\n\
+8=FIX.4.4^9=065^35=A^49=Server^56=Acme^34=1^52=$-$:$:$.$^98=0^108=30^10=$^\n\
+8=FIX.4.4^9=064^35=5^49=Acme^56=Server^34=2^52=$-$:$:$.$^58=bye bye^10=$^\n\
+8=FIX.4.4^9=115^35=D^49=Acme^56=Server^34=3^52=$-$:$:$.$^11=order-123^55=IBM^54=1^60=$-$:$:$.$^38=250^40=1^10=$^\n\
+8=FIX.4.4^9=053^35=5^49=Server^56=Acme^34=2^52=$-$:$:$.$^10=$^\n",
+	      actual);
+    free(actual);
+}
+
 void
 append_engine_tests(Test tests) {
     test_append(tests, "engine.normal", normal_test);
@@ -622,6 +827,12 @@ append_engine_tests(Test tests) {
     test_append(tests, "engine.bad_msgtype", bad_msgtype_test);
     test_append(tests, "engine.bad_dup", bad_dup_test);
     test_append(tests, "engine.dup", dup_test);
+    test_append(tests, "engine.bad_comp_id", bad_comp_id_test);
+    test_append(tests, "engine.bad_fix", bad_fix_test);
+    test_append(tests, "engine.bad_user", bad_user_test);
+    test_append(tests, "engine.bad_password", bad_password_test);
+    test_append(tests, "engine.after_logout", after_logout_test);
+
 
     // TBD seq number errors, duplicate with and without pos dup, out of sequence in past and future
 }

@@ -24,7 +24,6 @@
 
 typedef struct _EngSession {
     struct _EngSession	*next;
-    ofixEngine		engine;
     struct _ofixSession	session;
 } *EngSession;
 
@@ -94,8 +93,8 @@ session_create(ofixErr err, struct _ofixEngine *eng, int sock) {
 	free(es);
 	return NULL;
     }
-    es->engine = eng;
     _ofix_session_init(err, &es->session, eng->id, NULL, NULL, eng->spec, eng->recv_cb, eng->recv_ctx);
+    es->session.eng = eng;
     es->session.sock = sock;
     es->session.spec = eng->spec;
     es->session.log_on = eng->log_on;
@@ -112,7 +111,7 @@ session_destroy(ofixErr err, EngSession session) {
     if (NULL != session) {
 	EngSession	es;
 	EngSession	prev = NULL;
-	ofixEngine	eng = session->engine;
+	ofixEngine	eng = session->session.eng;
 
 	pthread_mutex_lock(&eng->session_mutex);
 	for (es = eng->sessions; NULL != es; es = es->next) {
@@ -158,7 +157,8 @@ skip_comment(char *s) {
 }
 
 static Auth
-read_auth(char *s) {
+read_auth(char **sp) {
+    char	*s = *sp;
     Auth	auth;
     char	*cid;
     char	*u = NULL;
@@ -201,8 +201,9 @@ read_auth(char *s) {
     }
     auth->next = NULL;
     auth->comp_id = cid;
-    auth->user = u;
-    auth->password = p;
+    auth->user = (('*' == *u && '\0' == u[1]) ? NULL : u);
+    auth->password = (('*' == *p && '\0' == p[1]) ? NULL : p);
+    *sp = s;
 
     return auth;
 }
@@ -253,13 +254,13 @@ load_auth(ofixErr err, ofixEngine eng, const char *filename) {
 	fclose(f);
 	return;
     }
+    fclose(f);
     eng->auth_data[size] = '\0';
     s = eng->auth_data;
-    while (NULL != (auth = read_auth(s))) {
+    while (NULL != (auth = read_auth(&s))) {
 	auth->next = eng->auths;
 	eng->auths = auth;
     }
-    fclose(f);
 }
 
 ofixEngine
@@ -537,4 +538,19 @@ ofix_engine_set_log(ofixEngine eng, ofixLogOn log_on, ofixLog log, void *ctx) {
 	eng->log = log;
     }
     eng->log_ctx = ctx;
+}
+
+bool
+ofix_engine_authorized(ofixEngine eng, const char *cid, const char *user, const char *password) {
+    Auth	a = eng->auths;
+
+    for (; NULL != a; a = a->next) {
+	if (0 == strcmp(a->comp_id, cid) &&
+	    (NULL == a->user || (NULL != user && 0 == strcmp(a->user, user))) &&
+	    (NULL == a->password || (NULL != password && 0 == strcmp(a->password, password)))) {
+	    return true;
+	}
+    }
+    // If no auths loaded so assume all are okay else return false.
+    return (NULL == eng->auths);
 }

@@ -4,8 +4,6 @@
 ^c^s show subtree
 
 - engine
- - logon
-  - use file with logon data in it
 
  - seq in future then send request resend 
 

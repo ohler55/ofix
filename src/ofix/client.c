@@ -64,9 +64,27 @@ ofix_client_create(ofixErr err,
 }
 
 void
+ofix_client_set_credentials(ofixClient client, const char *user, const char *password) {
+    free(client->user);
+    free(client->password);
+    if (NULL == user) {
+	client->user = NULL;
+    } else {
+	client->user = strdup(user);
+    }
+    if (NULL == password) {
+	client->password = NULL;
+    } else {
+	client->password = strdup(password);
+    }
+}
+
+void
 ofix_client_destroy(ofixErr err, ofixClient client) {
     if (NULL != client) {
 	_ofix_session_free(&client->session);
+	free(client->user);
+	free(client->password);
 	free(client);
     }
 }
@@ -214,3 +232,9 @@ ofix_client_set_log(ofixClient client, ofixLogOn log_on, ofixLog log, void *ctx)
     }
     client->session.log_ctx = ctx;
 }
+
+ofixSession
+_ofix_client_get_session(ofixClient client) {
+    return &client->session;
+}
+
