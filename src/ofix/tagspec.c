@@ -1,4 +1,4 @@
-// Copyright 2009 by Peter Ohler, All Rights Reserved
+// Copyright 2009, 2015 by Peter Ohler, All Rights Reserved
 
 #include "tagspec.h"
 

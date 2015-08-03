@@ -1,4 +1,4 @@
-// Copyright 2009 by Peter Ohler, All Rights Reserved
+// Copyright 2009, 2015 by Peter Ohler, All Rights Reserved
 
 #ifndef __OFIX_DTIME_H__
 #define __OFIX_DTIME_H__

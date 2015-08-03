@@ -1,4 +1,4 @@
-// Copyright 2015 by Peter Ohler, All Rights Reserved
+ // Copyright 2015 by Peter Ohler, All Rights Reserved
 
 #ifndef __OFIX_PRIVATE_H__
 #define __OFIX_PRIVATE_H__
@@ -27,6 +27,8 @@ struct _ofixSession {
     void		*recv_ctx;
     int			heartbeat_interval;
     int			target_heartbeat_interval;
+    double		heartbeat_next_send;
+    double		heartbeat_expect_recv;
     bool		done;
     bool		closed;
     bool		logon_sent;

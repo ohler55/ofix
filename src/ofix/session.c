@@ -1,4 +1,4 @@
-// Copyright 2009 by Peter Ohler, All Rights Reserved
+// Copyright 2009, 2015 by Peter Ohler, All Rights Reserved
 
 #include <arpa/inet.h>
 #include <ctype.h>
@@ -19,6 +19,8 @@
 #include "tag.h"
 #include "versionspec.h"
 #include "private.h"
+
+#define HEARTBEAT_TOLERANCE	2.0
 
 static bool
 log_on(void *ctx, ofixLogLevel level) {
@@ -45,6 +47,8 @@ _ofix_session_init(ofixErr err,
 		   ofixVersionSpec spec,
 		   ofixRecvCallback cb,
 		   void *ctx) {
+    double	now = dtime();
+
     if (NULL != err && OFIX_OK != err->code) {
 	return;
     }
@@ -69,6 +73,8 @@ _ofix_session_init(ofixErr err,
     s->recv_cb = cb;
     s->recv_ctx = ctx;
     s->heartbeat_interval = 30;
+    s->heartbeat_next_send = (double)s->heartbeat_interval + now;
+    s->heartbeat_expect_recv = 0.0;
     *s->store_dir = '\0';
     s->log_on = log_on;
     s->log = log;
@@ -131,6 +137,11 @@ ofix_session_create_msg(ofixErr err, ofixSession session, const char *type) {
 }
 
 static void
+reset_target_heartbeat(ofixSession session, double now) {
+    session->heartbeat_expect_recv = now + (double)session->target_heartbeat_interval + HEARTBEAT_TOLERANCE;
+}
+
+static void
 send_reject(ofixErr err,
 	    ofixSession session,
 	    int64_t seq,
@@ -161,9 +172,10 @@ send_reject(ofixErr err,
 
 static void
 handle_logon(ofixErr err, ofixSession session, ofixMsg msg) {
-    char		buf[16]; // longer than 32 is an error
-    char		*user;
-    char		*password;
+    char	buf[16]; // longer than 32 is an error
+    char	*user;
+    char	*password;
+    double	now;
 
     ofix_msg_copy_str(err, msg, OFIX_BeginStringTAG, buf, sizeof(buf));
     if (0 != strcmp(session->version_str, buf)) {
@@ -194,7 +206,7 @@ handle_logon(ofixErr err, ofixSession session, ofixMsg msg) {
 	ofix_session_logout(err, session, "Invalid credentials.");
 	return;
     }
-
+    now = dtime();
     // TBD verify sequence number (if there is some predefined start number)
     session->target_heartbeat_interval = (int)ofix_msg_get_int(err, msg, OFIX_HeartBtIntTAG);
     if (!session->logon_sent) {
@@ -206,6 +218,7 @@ handle_logon(ofixErr err, ofixSession session, ofixMsg msg) {
 	ofix_msg_set_int(err, reply, OFIX_EncryptMethodTAG, 0); // not encrypted
 	ofix_msg_set_int(err, reply, OFIX_HeartBtIntTAG, session->heartbeat_interval);
 	ofix_session_send(err, session, reply);
+	session->heartbeat_next_send = (double)session->heartbeat_interval + now;
     }
     session->logon_recv = true;
 }
@@ -224,6 +237,11 @@ handle_logout(ofixErr err, ofixSession session, ofixMsg msg) {
     // Even if failed to send, set the loutout_sent time so that the socket will
     // get closed.
     session->logout_sent = dtime();
+}
+
+static void
+handle_heartbeat(ofixErr err, ofixSession session, ofixMsg msg) {
+    // TBD it it has a TestReqID then handle any open test
 }
 
 static void
@@ -246,6 +264,7 @@ handle_session_msg(ofixErr err, ofixSession session, const char *mt, ofixMsg msg
 	handle_logon(err, session, msg);
 	break;
     case '0': // Heartbeat
+	handle_heartbeat(err, session, msg);
 	return false;
     case '1': // TestRequest
 	return false;
@@ -265,6 +284,130 @@ handle_session_msg(ofixErr err, ofixSession session, const char *mt, ofixMsg msg
     }
     session->recv_seq = seq;
     return true;
+}
+
+// If true is returned then do not delete the message.
+static bool
+process_msg(ofixErr err, ofixSession session, ofixMsg msg) {
+    bool	keep = false;
+    int64_t	seq = ofix_msg_get_int(err, msg, OFIX_MsgSeqNumTAG);
+    const char	*mt = ofix_msg_get_str(err, msg, OFIX_MsgTypeTAG);
+    const char	*sid = ofix_msg_get_str(err, msg, OFIX_SenderCompIDTAG);
+    const char	*tid = ofix_msg_get_str(err, msg, OFIX_TargetCompIDTAG);
+
+    // Errors handled later based on returned values.
+    ofix_err_clear(err);
+    if (NULL == session->store) {
+	// Server just got it's first message on this session.
+	char		path[1024];
+	time_t		now = time(NULL);
+	struct tm	*tm = gmtime(&now);
+	const char	*err_msg = "Message did not contain a sender identifier. Closing session.";
+
+	if (NULL == sid) {
+	    session->log(session->log_ctx, OFIX_WARN, err_msg);
+	    session->recv_seq = seq;
+	    send_reject(err, session, seq, mt, OFIX_SenderCompIDTAG, OFIX_REASON_COMP_ID, err_msg);
+
+	    return false;
+	}
+	session->tid = strdup(sid);
+	snprintf(path, sizeof(path), "%s/%s-%04d%02d%02d.%02d%02d%02d.fix",
+		 session->store_dir, session->tid,
+		 tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
+		 tm->tm_hour, tm->tm_min, tm->tm_sec);
+	session->store = ofix_store_create(err, path, session->tid);
+	if (OFIX_OK != err->code) {
+	    return false;
+	}
+    }
+    ofix_store_add(err, session->store, seq, OFIX_IODIR_RECV, msg);
+    if (0.0 < session->logout_sent) {
+	if (0 == strcmp("5", mt)) {
+	    handle_session_msg(err, session, mt, msg, seq);
+	}
+    } else if (NULL == sid || 0 != strcmp(session->tid, sid)) {
+	char	err_buf[1024];
+
+	snprintf(err_buf, sizeof(err_buf), "Expected sender of '%s'. Received '%s'.",
+		 session->tid, (NULL == sid ? "<null>" : sid));
+
+	session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
+	session->recv_seq = seq;
+	send_reject(err, session, seq, mt, OFIX_SenderCompIDTAG, OFIX_REASON_COMP_ID, err_buf);
+    } else if (NULL == tid || 0 != strcmp(session->sid, tid)) {
+	char	err_buf[1024];
+
+	snprintf(err_buf, sizeof(err_buf), "Expected target of '%s'. Received '%s'.",
+		 session->sid, (NULL == tid ? "<null>" : tid));
+	session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
+	session->recv_seq = seq;
+	send_reject(err, session, seq, mt, OFIX_TargetCompIDTAG, OFIX_REASON_COMP_ID, err_buf);
+    } else if (session->recv_seq >= seq) {
+	struct _ofixErr	derr = OFIX_ERR_INIT;
+	bool		dup = ofix_msg_get_bool(&derr, msg, OFIX_PossDupFlagTAG);
+
+	if (OFIX_OK != derr.code || !dup) {
+	    char	err_buf[1024];
+
+	    snprintf(err_buf, sizeof(err_buf),
+		     "Duplicate message %lld from '%s' not flagged as duplicate.",
+		     (long long)seq, (NULL == tid ? "<null>" : tid));
+	    session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
+	    send_reject(err, session, seq, mt, OFIX_MsgSeqNumTAG, OFIX_REASON_OTHER, err_buf);
+	    ofix_session_logout(err, session, "%s", err_buf);
+	} else if (handle_session_msg(err, session, mt, msg, seq)) {
+	    session->recv_seq = seq;
+	} else if (NULL != session->recv_cb) {
+	    keep = !session->recv_cb(session, msg, session->recv_ctx);
+	}
+    } else if (session->recv_seq + 1 != seq) {
+	session->log(session->log_ctx, OFIX_WARN,
+		     "'%s' did not send the correct sequence number. Received %lld. Expected %lld.",
+		     session->tid, (long long)seq, (long long)session->recv_seq + 1);
+	session->recv_seq = seq;
+	keep = !session->recv_cb(session, msg, session->recv_ctx);
+	// TBD queue the message and try to recover with resend request
+    } else if (handle_session_msg(err, session, mt, msg, seq)) {
+	session->recv_seq = seq;
+    } else if (NULL != session->recv_cb) { // at last, an app valid message
+	session->recv_seq = seq;
+	keep = !session->recv_cb(session, msg, session->recv_ctx);
+    }
+    reset_target_heartbeat(session, dtime());
+
+    return keep;
+}
+
+static void
+send_heartbeat(ofixErr err, ofixSession session, const char *id) {
+    ofixMsg	msg = ofix_session_create_msg(err, session, "0");
+
+    if (NULL == msg) {
+	return;
+    }
+    if (NULL != id && '\0' != *id) {
+	ofix_msg_set_str(err, msg, OFIX_TestReqIDTAG, id);
+    }
+    ofix_session_send(err, session, msg);
+}
+
+static void
+check_heartbeat(ofixSession session) {
+    double	now = dtime();
+
+    if (0 < session->heartbeat_interval && session->heartbeat_next_send <= now) {
+	struct _ofixErr	err = OFIX_ERR_INIT;
+
+	send_heartbeat(&err, session, NULL);
+	if (OFIX_OK != err.code) {
+	    session->log(session->log_ctx, OFIX_WARN, "error %d sending heartbeat - %s",
+			 err.code, err.msg);
+	}
+    }
+    if (0 < session->target_heartbeat_interval && session->heartbeat_expect_recv <= now) {
+	// TBD start missed heartbeat steps
+    }
 }
 
 static void*
@@ -321,6 +464,7 @@ session_loop(void *arg) {
 		if (0.0 < session->logout_sent && session->logout_sent < dtime() + LOGOUT_TIMEOUT) {
 		    session->done = true;
 		}
+		check_heartbeat(session);
 		continue;
 	    } else {
 		if (0.0 >= session->logout_sent) {
@@ -366,85 +510,7 @@ session_loop(void *arg) {
 		    session->recv_seq++;
 		}
 	    } else {
-		int64_t		seq = ofix_msg_get_int(&err, msg, OFIX_MsgSeqNumTAG);
-		const char	*mt = ofix_msg_get_str(&err, msg, OFIX_MsgTypeTAG);
-		bool		keep = false;
-		const char	*sid = ofix_msg_get_str(&err, msg, OFIX_SenderCompIDTAG);
-		const char	*tid = ofix_msg_get_str(&err, msg, OFIX_TargetCompIDTAG);
-
-		if (NULL == session->store) {
-		    // Server just got it's first message on this session.
-		    char	path[1024];
-		    time_t	now = time(NULL);
-		    struct tm	*tm = gmtime(&now);
-
-		    if (NULL == sid) {
-			session->log(session->log_ctx, OFIX_WARN,
-				     "Message did not contain a sender identifier. Closing session.");
-			session->done = true;
-			break;
-		    }
-		    session->tid = strdup(sid);
-		    snprintf(path, sizeof(path), "%s/%s-%04d%02d%02d.%02d%02d%02d.fix",
-			     session->store_dir, session->tid,
-			     tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
-			     tm->tm_hour, tm->tm_min, tm->tm_sec);
-		    session->store = ofix_store_create(&err, path, session->tid);
-		}
-		ofix_store_add(&err, session->store, seq, OFIX_IODIR_RECV, msg);
-		if (0.0 < session->logout_sent) {
-		    if (0 == strcmp("5", mt)) {
-			handle_session_msg(&err, session, mt, msg, seq);
-		    }
-		} else if (NULL == sid || 0 != strcmp(session->tid, sid)) {
-		    char	err_buf[1024];
-
-		    snprintf(err_buf, sizeof(err_buf), "Expected sender of '%s'. Received '%s'.",
-			     session->tid, (NULL == sid ? "<null>" : sid));
-
-		    session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
-		    session->recv_seq = seq;
-		    send_reject(&err, session, seq, mt, OFIX_SenderCompIDTAG, OFIX_REASON_COMP_ID, err_buf);
-		} else if (NULL == tid || 0 != strcmp(session->sid, tid)) {
-		    char	err_buf[1024];
-
-		    snprintf(err_buf, sizeof(err_buf), "Expected target of '%s'. Received '%s'.",
-			     session->sid, (NULL == tid ? "<null>" : tid));
-		    session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
-		    session->recv_seq = seq;
-		    send_reject(&err, session, seq, mt, OFIX_TargetCompIDTAG, OFIX_REASON_COMP_ID, err_buf);
-		} else if (session->recv_seq >= seq) {
-		    struct _ofixErr	derr = OFIX_ERR_INIT;
-		    bool		dup = ofix_msg_get_bool(&derr, msg, OFIX_PossDupFlagTAG);
-
-		    if (OFIX_OK != derr.code || !dup) {
-			char	err_buf[1024];
-
-			snprintf(err_buf, sizeof(err_buf),
-				 "Duplicate message %lld from '%s' not flagged as duplicate.",
-				 (long long)seq, (NULL == tid ? "<null>" : tid));
-			session->log(session->log_ctx, OFIX_WARN, "%s", err_buf);
-			send_reject(&err, session, seq, mt, OFIX_MsgSeqNumTAG, OFIX_REASON_OTHER, err_buf);
-			ofix_session_logout(&err, session, "%s", err_buf);
-		    } else if (handle_session_msg(&err, session, mt, msg, seq)) {
-			session->recv_seq = seq;
-		    } else if (NULL != session->recv_cb) {
-			keep = !session->recv_cb(session, msg, session->recv_ctx);
-		    }
-		} else if (session->recv_seq + 1 != seq) {
-		    session->log(session->log_ctx, OFIX_WARN,
-				 "'%s' did not send the correct sequence number. Received %lld. Expected %lld.",
-				 session->tid, (long long)seq, (long long)session->recv_seq + 1);
-		    session->recv_seq = seq;
-		    keep = !session->recv_cb(session, msg, session->recv_ctx);
-		    // TBD queue the message and try to recover with resend request
-		} else if (handle_session_msg(&err, session, mt, msg, seq)) {
-		    session->recv_seq = seq;
-		} else if (NULL != session->recv_cb) {
-		    session->recv_seq = seq;
-		    keep = !session->recv_cb(session, msg, session->recv_ctx);
-		}
-		if (!keep) {
+		if (!process_msg(&err, session, msg)) {
 		    ofix_msg_destroy(msg);
 		}
 	    }
@@ -455,6 +521,7 @@ session_loop(void *arg) {
 		ofix_err_clear(&err);
 	    }
 	}
+	check_heartbeat(session);
     }
     if (0 < session->sock) {
 	close(session->sock);
@@ -529,6 +596,8 @@ ofix_session_send(ofixErr err, ofixSession session, ofixMsg msg) {
     }
     pthread_mutex_unlock(&session->send_mutex);
     ofix_store_add(err, session->store, seq, OFIX_IODIR_SEND, msg);
+    // reset the heartbeat timer
+    session->heartbeat_next_send = (double)session->heartbeat_interval + (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
 }
 
 // only used for testing bad messages
