@@ -48,5 +48,6 @@ extern ofixMsg	ofix_session_get_msg(ofixErr err, ofixSession session, int64_t se
 extern int64_t	ofix_session_send_seqnum(ofixSession session);
 extern int64_t	ofix_session_recv_seqnum(ofixSession session);
 extern ofixMsg	ofix_session_create_msg(ofixErr err, ofixSession session, const char *type);
+extern void	ofix_session_set_heartbeat(ofixSession session, int interval);
 
 #endif /* __OFIX_SESSION_H__ */

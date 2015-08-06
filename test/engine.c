@@ -1,4 +1,4 @@
-// Copyright 2009, 2015 by Peter Ohler, All Rights Reserved
+ // Copyright 2009, 2015 by Peter Ohler, All Rights Reserved
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -819,6 +819,46 @@ after_logout_test() {
     free(actual);
 }
 
+static void
+heartbeat_test() {
+    struct _ofixErr	err = OFIX_ERR_INIT;
+    ofixEngine		server;
+    ofixClient		client;
+    ofixSession		session;
+    double		giveup;
+    char		*actual;
+
+    if (!create_client_server(&err, &server, &client, 6172, "Client", NULL, NULL, 4)) {
+	return;
+    }
+    // wait for exchanges to complete
+    giveup = dtime() + 1.0;
+    while (1 > ofix_client_recv_seqnum(client)) {
+	if (giveup < dtime()) {
+	    test_print("Timed out waiting for client to receive responses.\n");
+	    test_fail();
+	    return;
+	}
+	dsleep(0.01);
+    }
+    ofix_client_set_heartbeat(client, 2);
+    session = ofix_engine_get_session(&err, server, "Client");
+    ofix_session_set_heartbeat(session, 3);
+    dsleep(5.0);
+    ofix_client_destroy(&err, client);
+    ofix_engine_destroy(&err, server);
+    actual = load_fix_file(client_storage);
+    test_same("sender: Client\n\
+\n\
+8=FIX.4.4^9=073^35=A^49=Client^56=Server^34=1^52=$-$:$:$.$^98=0^108=30^141=Y^10=$^\n\
+8=FIX.4.4^9=066^35=A^49=Server^56=Client^34=1^52=$-$:$:$.$^98=0^108=0^10=$^\n\
+8=FIX.4.4^9=055^35=0^49=Client^56=Server^34=2^52=$-$:$:$.$^10=$^\n\
+8=FIX.4.4^9=055^35=0^49=Server^56=Client^34=2^52=$-$:$:$.$^10=$^\n\
+8=FIX.4.4^9=055^35=0^49=Client^56=Server^34=3^52=$-$:$:$.$^10=$^\n",
+	      actual);
+    free(actual);
+}
+
 void
 append_engine_tests(Test tests) {
     test_append(tests, "engine.normal", normal_test);
@@ -832,7 +872,7 @@ append_engine_tests(Test tests) {
     test_append(tests, "engine.bad_user", bad_user_test);
     test_append(tests, "engine.bad_password", bad_password_test);
     test_append(tests, "engine.after_logout", after_logout_test);
-
+    test_append(tests, "engine.heartbeat_logout", heartbeat_test);
 
     // TBD seq number errors, duplicate with and without pos dup, out of sequence in past and future
 }

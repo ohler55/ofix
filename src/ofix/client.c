@@ -233,6 +233,11 @@ ofix_client_set_log(ofixClient client, ofixLogOn log_on, ofixLog log, void *ctx)
     client->session.log_ctx = ctx;
 }
 
+void
+ofix_client_set_heartbeat(ofixClient client, int interval) {
+    ofix_session_set_heartbeat(&client->session, interval);
+}
+
 ofixSession
 _ofix_client_get_session(ofixClient client) {
     return &client->session;

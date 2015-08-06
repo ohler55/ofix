@@ -6,18 +6,6 @@
 - engine
 
  - seq in future then send request resend 
-
- - Heartbeat
-  - allow heartbeat interval to be set
-  - engine session create should set interval
-
-  - test
-   - set heartbeat to 2 and run for 5 seconds recording log
-    - might have to use 2 on client and 3 on server or something to get interleaving correct
-   - test with other than heartbeat message
-   - how to test failed to send message in x time
-    - change heartbeat interval after connection?
-    
  - TestRequest
  - ResendRequest
  - SequenceReset
@@ -25,8 +13,6 @@
  - server FIX version select on recv 
 
  - tests
-  - logon creds
-  - heartbeats
   - test request
   - resend
   - seq reset

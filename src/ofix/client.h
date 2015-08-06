@@ -70,5 +70,6 @@ extern int64_t	ofix_client_send_seqnum(ofixClient client);
 extern int64_t	ofix_client_recv_seqnum(ofixClient client);
 
 extern void	ofix_client_set_log(ofixClient client, ofixLogOn log_on, ofixLog log, void *ctx);
+extern void	ofix_client_set_heartbeat(ofixClient client, int interval);
 
 #endif /* __OFIX_CLIENT_H__ */

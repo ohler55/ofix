@@ -42,6 +42,7 @@ extern const char*	ofix_engine_ipaddr(ofixEngine eng);
 extern const char*	ofix_engine_store_dir(ofixEngine eng);
 extern int		ofix_engine_heartbeat_interval(ofixEngine eng);
 extern int		ofix_engine_port(ofixEngine eng);
+extern void		ofix_engine_set_heartbeat(ofixEngine eng, int interval);
 
 /**
  *

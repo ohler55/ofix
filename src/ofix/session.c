@@ -671,3 +671,17 @@ ofix_session_logout(ofixErr err, ofixSession session, const char *txt, ...) {
     }
     ofix_session_send(err, session, msg);
 }
+
+void
+ofix_session_set_heartbeat(ofixSession session, int interval) {
+    if (0.0 < session->heartbeat_next_send) {
+	double	now = dtime();
+
+	session->heartbeat_next_send -= (double)session->heartbeat_interval;
+	session->heartbeat_next_send += (double)interval;
+	if (session->heartbeat_next_send < now) {
+	    session->heartbeat_next_send = now;
+	}
+    }
+    session->heartbeat_interval = interval;
+}

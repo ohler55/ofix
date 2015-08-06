@@ -100,6 +100,7 @@ session_create(ofixErr err, struct _ofixEngine *eng, int sock) {
     es->session.log_on = eng->log_on;
     es->session.log = eng->log;
     es->session.log_ctx = eng->log_ctx;
+    es->session.heartbeat_interval = eng->heartbeat_interval;
     strncpy(es->session.store_dir, eng->store_dir, sizeof(es->session.store_dir));
     es->session.store_dir[sizeof(es->session.store_dir) - 1] = '\0';
 
@@ -553,4 +554,9 @@ ofix_engine_authorized(ofixEngine eng, const char *cid, const char *user, const 
     }
     // If no auths loaded so assume all are okay else return false.
     return (NULL == eng->auths);
+}
+
+void
+ofix_engine_set_heartbeat(ofixEngine eng, int interval) {
+    eng->heartbeat_interval = interval;
 }
