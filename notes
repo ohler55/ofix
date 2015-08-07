@@ -7,6 +7,9 @@
 
  - seq in future then send request resend 
  - TestRequest
+  - test
+   - change client heartbeat interval after creation
+   - wait for test request
  - ResendRequest
  - SequenceReset
 

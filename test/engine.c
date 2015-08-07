@@ -145,7 +145,7 @@ create_client_server(ofixErr err,
     gettimeofday(&tv, &tz);
     ofix_date_set_timestamp(&now, (uint64_t)tv.tv_sec * 1000000LL + (uint64_t)tv.tv_usec);
 
-    *server = ofix_engine_create(err, "Server", port, "auth.txt", "server_storage", vspec, 0);
+    *server = ofix_engine_create(err, "Server", port, "auth.txt", "server_storage", vspec, 30);
     if (OFIX_OK != err->code || NULL == *server) {
 	test_print("Failed to create server [%d] %s\n", err->code, err->msg);
 	test_fail();
@@ -213,6 +213,8 @@ run_test(ofixMsg *msgs, bool raw, int server_seq, int port) {
 	if (giveup < dtime()) {
 	    test_print("Timed out waiting for client to receive responses.\n");
 	    test_fail();
+	    ofix_client_destroy(&err, client);
+	    ofix_engine_destroy(&err, server);
 	    return;
 	}
 	dsleep(0.01);
@@ -851,7 +853,7 @@ heartbeat_test() {
     test_same("sender: Client\n\
 \n\
 8=FIX.4.4^9=073^35=A^49=Client^56=Server^34=1^52=$-$:$:$.$^98=0^108=30^141=Y^10=$^\n\
-8=FIX.4.4^9=066^35=A^49=Server^56=Client^34=1^52=$-$:$:$.$^98=0^108=0^10=$^\n\
+8=FIX.4.4^9=067^35=A^49=Server^56=Client^34=1^52=$-$:$:$.$^98=0^108=30^10=$^\n\
 8=FIX.4.4^9=055^35=0^49=Client^56=Server^34=2^52=$-$:$:$.$^10=$^\n\
 8=FIX.4.4^9=055^35=0^49=Server^56=Client^34=2^52=$-$:$:$.$^10=$^\n\
 8=FIX.4.4^9=055^35=0^49=Client^56=Server^34=3^52=$-$:$:$.$^10=$^\n",

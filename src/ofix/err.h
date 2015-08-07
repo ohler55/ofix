@@ -4,6 +4,7 @@
 #define __OFIX_ERR_H__
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdarg.h>
 
 #define OFIX_ERR_INIT	{ 0, 0, 0, 0, { 0 }, { 0 } }

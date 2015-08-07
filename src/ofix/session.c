@@ -21,6 +21,7 @@
 #include "private.h"
 
 #define HEARTBEAT_TOLERANCE	2.0
+#define HEARTBEAT_GIVEUP	2.0
 
 static bool
 log_on(void *ctx, ofixLogLevel level) {
@@ -142,6 +143,42 @@ reset_target_heartbeat(ofixSession session, double now) {
 }
 
 static void
+send_heartbeat(ofixErr err, ofixSession session, const char *id) {
+    ofixMsg	msg = ofix_session_create_msg(err, session, "0");
+
+    if (NULL == msg) {
+	return;
+    }
+    if (NULL != id && '\0' != *id) {
+	ofix_msg_set_str(err, msg, OFIX_TestReqIDTAG, id);
+    }
+    ofix_session_send(err, session, msg);
+}
+
+static void
+send_test_request(ofixErr err, ofixSession session) {
+    ofixMsg		msg = ofix_session_create_msg(err, session, "1");
+    struct timeval	tv;
+    struct timezone	tz;
+    struct _ofixDate	now;
+    char		*id;
+
+    if (NULL == msg) {
+	return;
+    }
+
+    if (NULL != err && OFIX_OK != err->code) {
+	return;
+    }
+    gettimeofday(&tv, &tz);
+    ofix_date_set_timestamp(&now, (uint64_t)tv.tv_sec * 1000000LL + (uint64_t)tv.tv_usec);
+    id = ofix_date_to_str(&now);
+    ofix_msg_set_str(err, msg, OFIX_TestReqIDTAG, id);
+    free(id);
+    ofix_session_send(err, session, msg);
+}
+
+static void
 send_reject(ofixErr err,
 	    ofixSession session,
 	    int64_t seq,
@@ -202,10 +239,14 @@ handle_logon(ofixErr err, ofixSession session, ofixMsg msg) {
 	!ofix_engine_authorized(session->eng, session->tid, user, password)) {
 	struct _ofixErr	ignore = OFIX_ERR_INIT;
 
+	free(user);
+	free(password);
 	send_reject(&ignore, session, 0, "A", 0, OFIX_REASON_SIGNATURE, "Invalid credentials.");
 	ofix_session_logout(err, session, "Invalid credentials.");
 	return;
     }
+    free(user);
+    free(password);
     now = dtime();
     // TBD verify sequence number (if there is some predefined start number)
     session->target_heartbeat_interval = (int)ofix_msg_get_int(err, msg, OFIX_HeartBtIntTAG);
@@ -241,7 +282,15 @@ handle_logout(ofixErr err, ofixSession session, ofixMsg msg) {
 
 static void
 handle_heartbeat(ofixErr err, ofixSession session, ofixMsg msg) {
-    // TBD it it has a TestReqID then handle any open test
+    // Got a message so timer can be reset, TestReqId doesn't matter really.
+}
+
+static void
+handle_test_request(ofixErr err, ofixSession session, ofixMsg msg) {
+    char	*id = ofix_msg_get_str(NULL, msg, OFIX_TestReqIDTAG);
+
+    send_heartbeat(err, session, id);
+    free(id);
 }
 
 static void
@@ -264,10 +313,11 @@ handle_session_msg(ofixErr err, ofixSession session, const char *mt, ofixMsg msg
 	handle_logon(err, session, msg);
 	break;
     case '0': // Heartbeat
-	handle_heartbeat(err, session, msg);
-	return false;
+	handle_test_request(err, session, msg);
+	break;
     case '1': // TestRequest
-	return false;
+	handle_heartbeat(err, session, msg);
+	break;
     case '2': // ResendRequest
 	return false;
     case '3': // Reject
@@ -380,25 +430,11 @@ process_msg(ofixErr err, ofixSession session, ofixMsg msg) {
 }
 
 static void
-send_heartbeat(ofixErr err, ofixSession session, const char *id) {
-    ofixMsg	msg = ofix_session_create_msg(err, session, "0");
-
-    if (NULL == msg) {
-	return;
-    }
-    if (NULL != id && '\0' != *id) {
-	ofix_msg_set_str(err, msg, OFIX_TestReqIDTAG, id);
-    }
-    ofix_session_send(err, session, msg);
-}
-
-static void
 check_heartbeat(ofixSession session) {
-    double	now = dtime();
+    struct _ofixErr	err = OFIX_ERR_INIT;
+    double		now = dtime();
 
     if (0 < session->heartbeat_interval && session->heartbeat_next_send <= now) {
-	struct _ofixErr	err = OFIX_ERR_INIT;
-
 	send_heartbeat(&err, session, NULL);
 	if (OFIX_OK != err.code) {
 	    session->log(session->log_ctx, OFIX_WARN, "error %d sending heartbeat - %s",
@@ -406,7 +442,12 @@ check_heartbeat(ofixSession session) {
 	}
     }
     if (0 < session->target_heartbeat_interval && session->heartbeat_expect_recv <= now) {
-	// TBD start missed heartbeat steps
+	if (session->heartbeat_expect_recv + HEARTBEAT_GIVEUP <= now) {
+	    // Connection lost, shut it down.
+	    session->done = true;
+	} else {
+	    send_test_request(&err, session);
+	}
     }
 }
 
