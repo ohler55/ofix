@@ -214,6 +214,18 @@ send_test_request(ofixErr err, ofixSession session) {
 }
 
 static void
+send_resend_request(ofixErr err, ofixSession session, int64_t begin, int64_t end) {
+    ofixMsg	msg = ofix_session_create_msg(err, session, "2");
+
+    if (NULL == msg || (NULL != err && OFIX_OK != err->code)) {
+	return;
+    }
+    ofix_msg_set_int(err, msg, OFIX_BeginSeqNoTAG, begin);
+    ofix_msg_set_int(err, msg, OFIX_EndSeqNoTAG, end);
+    ofix_session_send(err, session, msg);
+}
+
+static void
 send_reject(ofixErr err,
 	    ofixSession session,
 	    int64_t seq,
@@ -488,7 +500,7 @@ process_msg(ofixErr err, ofixSession session, ofixMsg msg) {
 		     session->tid, (long long)seq, (long long)session->recv_seq + 1);
 	session->recv_seq = seq;
 	keep = !session->recv_cb(session, msg, session->recv_ctx);
-	// TBD queue the message and try to recover with resend request
+	send_resend_request(err, session, session->recv_seq + 1, 0);
     } else if (handle_session_msg(err, session, mt, msg, seq)) {
 	session->recv_seq = seq;
     } else if (NULL != session->recv_cb) { // at last, an app valid message

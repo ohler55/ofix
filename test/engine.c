@@ -904,6 +904,117 @@ test_request_test() {
     free(actual);
 }
 
+static void
+resend_test() {
+    struct _ofixErr	err = OFIX_ERR_INIT;
+    ofixMsgSpec		spec = ofix_version_spec_get_msg_spec(&err, "D", 4, 4);
+    ofixMsgSpec		resend_spec = ofix_version_spec_get_msg_spec(&err, "2", 4, 4);
+    ofixEngine		server;
+    ofixClient		client;
+    ofixMsg		msg;
+    ofixMsg		rmsg;
+    double		giveup;
+    char		*actual;
+    struct timeval	tv;
+    struct timezone	tz;
+    struct _ofixDate	now;
+
+    gettimeofday(&tv, &tz);
+    ofix_date_set_timestamp(&now, (uint64_t)tv.tv_sec * 1000000LL + (uint64_t)tv.tv_usec);
+
+    if (!create_client_server(&err, &server, &client, 6174, "Client", NULL, NULL, 4, 30)) {
+	return;
+    }
+    // wait for exchanges to complete
+    giveup = dtime() + 1.0;
+    while (1 > ofix_client_recv_seqnum(client)) {
+	if (giveup < dtime()) {
+	    test_print("Timed out waiting for client to receive responses.\n");
+	    test_fail();
+	    return;
+	}
+	dsleep(0.01);
+    }
+
+    msg = ofix_msg_create_from_spec(&err, spec, 16);
+    if (OFIX_OK != err.code || NULL == msg) {
+	test_print("Failed to create message [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
+    ofix_msg_set_str(&err, msg, OFIX_ClOrdIDTAG, "order-123");
+    ofix_msg_set_str(&err, msg, OFIX_SymbolTAG, "IBM");
+    ofix_msg_set_char(&err, msg, OFIX_SideTAG, '1'); // buy
+    ofix_msg_set_int(&err, msg, OFIX_OrderQtyTAG, 250);
+    ofix_msg_set_date(&err, msg, OFIX_TransactTimeTAG, &now);
+    ofix_msg_set_char(&err, msg, OFIX_OrdTypeTAG, '1'); // market order
+    if (OFIX_OK != err.code) {
+	test_print("Error while setting fields in message [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
+    ofix_client_send(&err, client, msg);
+    while (2 > ofix_client_recv_seqnum(client)) {
+	if (giveup < dtime()) {
+	    test_print("Timed out waiting for client to receive responses.\n");
+	    test_fail();
+	    return;
+	}
+	dsleep(0.01);
+    }
+    // second message
+    ofix_msg_set_str(&err, msg, OFIX_ClOrdIDTAG, "order-124");
+    ofix_client_send(&err, client, msg);
+    while (3 > ofix_client_recv_seqnum(client)) {
+	if (giveup < dtime()) {
+	    test_print("Timed out waiting for client to receive responses.\n");
+	    test_fail();
+	    return;
+	}
+	dsleep(0.01);
+    }
+    // send resend request
+    rmsg = ofix_msg_create_from_spec(&err, resend_spec, 10);
+    if (OFIX_OK != err.code || NULL == rmsg) {
+	test_print("Failed to create message [%d] %s\n", err.code, err.msg);
+	test_fail();
+	return;
+    }
+    ofix_msg_set_int(&err, rmsg, OFIX_BeginSeqNoTAG, 2);
+    ofix_msg_set_int(&err, rmsg, OFIX_EndSeqNoTAG, 2);
+    ofix_client_send(&err, client, rmsg);
+    // third message to verify seq number is correct
+    ofix_msg_set_str(&err, msg, OFIX_ClOrdIDTAG, "order-125");
+    ofix_client_send(&err, client, msg);
+
+    while (4 > ofix_client_recv_seqnum(client)) {
+	if (giveup < dtime()) {
+	    test_print("Timed out waiting for client to receive responses.\n");
+	    test_fail();
+	    return;
+	}
+	dsleep(0.01);
+    }
+
+    ofix_client_destroy(&err, client);
+    ofix_engine_destroy(&err, server);
+    actual = load_fix_file(client_storage);
+    test_same("sender: Client\n\
+\n\
+8=FIX.4.4^9=073^35=A^49=Client^56=Server^34=1^52=$-$:$:$.$^98=0^108=30^141=Y^10=$^\n\
+8=FIX.4.4^9=067^35=A^49=Server^56=Client^34=1^52=$-$:$:$.$^98=0^108=30^10=$^\n\
+8=FIX.4.4^9=117^35=D^49=Client^56=Server^34=2^52=$-$:$:$.$^11=order-123^55=IBM^54=1^60=$-$:$:$.$^38=250^40=1^10=$^\n\
+8=FIX.4.4^9=125^35=8^49=Server^56=Client^34=2^52=$-$:$:$.$^37=order-123^17=x-order-123^150=0^39=0^55=IBM^54=1^151=250^14=250^6=0^10=$^\n\
+8=FIX.4.4^9=117^35=D^49=Client^56=Server^34=3^52=$-$:$:$.$^11=order-124^55=IBM^54=1^60=$-$:$:$.$^38=250^40=1^10=$^\n\
+8=FIX.4.4^9=125^35=8^49=Server^56=Client^34=3^52=$-$:$:$.$^37=order-124^17=x-order-124^150=0^39=0^55=IBM^54=1^151=250^14=250^6=0^10=$^\n\
+8=FIX.4.4^9=064^35=2^49=Client^56=Server^34=4^52=$-$:$:$.$^7=2^16=2^10=$^\n\
+8=FIX.4.4^9=117^35=D^49=Client^56=Server^34=5^52=$-$:$:$.$^11=order-125^55=IBM^54=1^60=$-$:$:$.$^38=250^40=1^10=$^\n\
+8=FIX.4.4^9=130^35=8^49=Server^56=Client^34=2^43=Y^52=$-$:$:$.$^37=order-123^17=x-order-123^150=0^39=0^55=IBM^54=1^151=250^14=250^6=0^10=$^\n\
+8=FIX.4.4^9=125^35=8^49=Server^56=Client^34=4^52=$-$:$:$.$^37=order-125^17=x-order-125^150=0^39=0^55=IBM^54=1^151=250^14=250^6=0^10=$^\n",
+	      actual);
+    free(actual);
+}
+
 void
 append_engine_tests(Test tests) {
     test_append(tests, "engine.normal", normal_test);
@@ -919,6 +1030,5 @@ append_engine_tests(Test tests) {
     test_append(tests, "engine.after_logout", after_logout_test);
     test_append(tests, "engine.heartbeat", heartbeat_test);
     test_append(tests, "engine.test_request", test_request_test);
-
-    // TBD seq number errors, duplicate with and without pos dup, out of sequence in past and future
+    test_append(tests, "engine.resend", resend_test);
 }

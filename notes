@@ -5,27 +5,8 @@
 
 - engine
 
- - seq in future then send request resend 
- - ResendRequest
-  - test
-   - send 2 message
-   - resend request for first
-   - send a 3rd message
-   - verify seq is correct for 3rd (wait on third)
-
  - SequenceReset
 
  - server FIX version select on recv 
 
- - tests
-  - test request
-  - resend
-  - seq reset
-  - rejects (various reasons)
-
-- validate
- - implement validation for tag order
- - tolerant option
-  - allow out of order tags
-  - allow additional tags
 
