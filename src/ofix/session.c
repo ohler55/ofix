@@ -104,6 +104,7 @@ _ofix_session_init(ofixErr err,
     s->closed = true;
     s->logon_sent = false;
     s->logon_recv = false;
+    s->test_req_sent = false;
     s->logout_sent = 0.0;
 }
 
@@ -140,6 +141,39 @@ ofix_session_create_msg(ofixErr err, ofixSession session, const char *type) {
 static void
 reset_target_heartbeat(ofixSession session, double now) {
     session->heartbeat_expect_recv = now + (double)session->target_heartbeat_interval + HEARTBEAT_TOLERANCE;
+    session->test_req_sent = false;
+}
+
+static bool
+resend(ofixErr err, ofixSession session, int64_t seq) {
+    int		cnt;
+    const char	*str;
+    ofixMsg	msg = ofix_store_get(err, session->store, seq, OFIX_IODIR_SEND);
+
+    if (NULL != err && OFIX_OK != err->code) {
+	return false;
+    }
+    ofix_msg_set_bool(err, msg, OFIX_PossDupFlagTAG, true);
+    cnt = ofix_msg_size(err, msg);
+    str = ofix_msg_FIX_str(err, msg);
+    pthread_mutex_lock(&session->send_mutex);
+    if (cnt != send(session->sock, str, cnt, 0)) {
+	if (NULL != err) {
+	    err->code = OFIX_WRITE_ERR;
+	    snprintf(err->msg, sizeof(err->msg),
+		     "Failed to send message. error [%d] %s", errno, strerror(errno));
+	}
+    }
+    pthread_mutex_unlock(&session->send_mutex);
+    if (session->log_on(session->log_ctx, OFIX_DEBUG)) {
+	char	*s = ofix_msg_to_str(err, msg);
+
+	session->log(session->log_ctx, OFIX_DEBUG, "Resent %s", s);
+	free(s);
+    }
+    session->heartbeat_next_send = (double)session->heartbeat_interval + dtime();
+
+    return true;
 }
 
 static void
@@ -152,6 +186,7 @@ send_heartbeat(ofixErr err, ofixSession session, const char *id) {
     if (NULL != id && '\0' != *id) {
 	ofix_msg_set_str(err, msg, OFIX_TestReqIDTAG, id);
     }
+    session->heartbeat_next_send = dtime() + (double)session->heartbeat_interval;
     ofix_session_send(err, session, msg);
 }
 
@@ -163,10 +198,10 @@ send_test_request(ofixErr err, ofixSession session) {
     struct _ofixDate	now;
     char		*id;
 
+    session->test_req_sent = true;
     if (NULL == msg) {
 	return;
     }
-
     if (NULL != err && OFIX_OK != err->code) {
 	return;
     }
@@ -294,6 +329,41 @@ handle_test_request(ofixErr err, ofixSession session, ofixMsg msg) {
 }
 
 static void
+handle_resend_request(ofixErr err, ofixSession session, ofixMsg msg) {
+    int64_t	begin = ofix_msg_get_int(err, msg, OFIX_BeginSeqNoTAG);
+    int64_t	end;
+
+    if (OFIX_OK != err->code) {
+	int64_t	seq = ofix_msg_get_int(err, msg, OFIX_MsgSeqNumTAG);
+
+	session->log(session->log_ctx, OFIX_WARN, err->msg);
+	send_reject(err, session, seq, "2", OFIX_BeginSeqNoTAG, OFIX_REASON_MISSING_TAG, err->msg);
+	return;
+    }
+    end = ofix_msg_get_int(err, msg, OFIX_EndSeqNoTAG);
+    if (OFIX_OK != err->code) {
+	int64_t	seq = ofix_msg_get_int(err, msg, OFIX_MsgSeqNumTAG);
+
+	session->log(session->log_ctx, OFIX_WARN, err->msg);
+	send_reject(err, session, seq, "2", OFIX_EndSeqNoTAG, OFIX_REASON_MISSING_TAG, err->msg);
+	return;
+    }
+    if (begin <= end) {
+	for (; begin <= end; begin++) {
+	    if (!resend(err, session, begin)) {
+		break;
+	    }
+	}
+    } else {
+	for (; true; begin++) {
+	    if (!resend(err, session, begin)) {
+		break;
+	    }
+	}
+    }
+}
+
+static void
 handle_reject(ofixErr err, ofixSession session, ofixMsg msg) {
     if (!session->logon_recv) {
 	session->logon_recv = true;
@@ -313,13 +383,14 @@ handle_session_msg(ofixErr err, ofixSession session, const char *mt, ofixMsg msg
 	handle_logon(err, session, msg);
 	break;
     case '0': // Heartbeat
-	handle_test_request(err, session, msg);
-	break;
-    case '1': // TestRequest
 	handle_heartbeat(err, session, msg);
 	break;
+    case '1': // TestRequest
+	handle_test_request(err, session, msg);
+	break;
     case '2': // ResendRequest
-	return false;
+	handle_resend_request(err, session, msg);
+	break;
     case '3': // Reject
 	handle_reject(err, session, msg);
 	break;
@@ -445,7 +516,7 @@ check_heartbeat(ofixSession session) {
 	if (session->heartbeat_expect_recv + HEARTBEAT_GIVEUP <= now) {
 	    // Connection lost, shut it down.
 	    session->done = true;
-	} else {
+	} else if (!session->test_req_sent) {
 	    send_test_request(&err, session);
 	}
     }
@@ -620,13 +691,6 @@ ofix_session_send(ofixErr err, ofixSession session, ofixMsg msg) {
     seq = session->sent_seq;
     ofix_msg_set_int(err, msg, OFIX_MsgSeqNumTAG, seq);
     cnt = ofix_msg_size(err, msg);
-
-    if (session->log_on(session->log_ctx, OFIX_DEBUG)) {
-	char	*s = ofix_msg_to_str(err, msg);
-
-	session->log(session->log_ctx, OFIX_DEBUG, "Sending %s", s);
-	free(s);
-    }
     str = ofix_msg_FIX_str(err, msg);
     if (cnt != send(session->sock, str, cnt, 0)) {
 	if (NULL != err) {
@@ -637,6 +701,12 @@ ofix_session_send(ofixErr err, ofixSession session, ofixMsg msg) {
     }
     pthread_mutex_unlock(&session->send_mutex);
     ofix_store_add(err, session->store, seq, OFIX_IODIR_SEND, msg);
+    if (session->log_on(session->log_ctx, OFIX_DEBUG)) {
+	char	*s = ofix_msg_to_str(err, msg);
+
+	session->log(session->log_ctx, OFIX_DEBUG, "Sent %s", s);
+	free(s);
+    }
     // reset the heartbeat timer
     session->heartbeat_next_send = (double)session->heartbeat_interval + (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
 }
@@ -715,14 +785,16 @@ ofix_session_logout(ofixErr err, ofixSession session, const char *txt, ...) {
 
 void
 ofix_session_set_heartbeat(ofixSession session, int interval) {
-    if (0.0 < session->heartbeat_next_send) {
-	double	now = dtime();
+    double	now = dtime();
 
+    if (0.0 < session->heartbeat_next_send) {
 	session->heartbeat_next_send -= (double)session->heartbeat_interval;
 	session->heartbeat_next_send += (double)interval;
 	if (session->heartbeat_next_send < now) {
 	    session->heartbeat_next_send = now;
 	}
+    } else {
+	session->heartbeat_next_send = (double)interval + now;
     }
     session->heartbeat_interval = interval;
 }

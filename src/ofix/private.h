@@ -33,6 +33,7 @@ struct _ofixSession {
     bool		closed;
     bool		logon_sent;
     bool		logon_recv;
+    bool		test_req_sent;
     double		logout_sent;
     pthread_t		thread;
     pthread_mutex_t	send_mutex;

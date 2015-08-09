@@ -6,11 +6,13 @@
 - engine
 
  - seq in future then send request resend 
- - TestRequest
-  - test
-   - change client heartbeat interval after creation
-   - wait for test request
  - ResendRequest
+  - test
+   - send 2 message
+   - resend request for first
+   - send a 3rd message
+   - verify seq is correct for 3rd (wait on third)
+
  - SequenceReset
 
  - server FIX version select on recv 
