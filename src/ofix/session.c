@@ -376,6 +376,16 @@ handle_resend_request(ofixErr err, ofixSession session, ofixMsg msg) {
 }
 
 static void
+handle_sequence_reset(ofixErr err, ofixSession session, ofixMsg msg) {
+    int64_t	seq = ofix_msg_get_int(err, msg, OFIX_NewSeqNoTAG);
+
+    if (session->recv_seq < seq) {
+	session->recv_seq = seq - 1; // one less so we expect new seq next
+    }
+}
+
+
+static void
 handle_reject(ofixErr err, ofixSession session, ofixMsg msg) {
     if (!session->logon_recv) {
 	session->logon_recv = true;
@@ -407,15 +417,14 @@ handle_session_msg(ofixErr err, ofixSession session, const char *mt, ofixMsg msg
 	handle_reject(err, session, msg);
 	break;
     case '4': // SequenceReset
-	return false;
+	handle_sequence_reset(err, session, msg);
+	break;
     case '5': // Logout
 	handle_logout(err, session, msg);
 	break;
     default:
-	session->recv_seq = seq;
 	return false;
     }
-    session->recv_seq = seq;
     return true;
 }
 
@@ -458,6 +467,7 @@ process_msg(ofixErr err, ofixSession session, ofixMsg msg) {
     if (0.0 < session->logout_sent) {
 	if (0 == strcmp("5", mt)) {
 	    handle_session_msg(err, session, mt, msg, seq);
+	    session->recv_seq = seq;
 	}
     } else if (NULL == sid || 0 != strcmp(session->tid, sid)) {
 	char	err_buf[1024];
@@ -490,7 +500,7 @@ process_msg(ofixErr err, ofixSession session, ofixMsg msg) {
 	    send_reject(err, session, seq, mt, OFIX_MsgSeqNumTAG, OFIX_REASON_OTHER, err_buf);
 	    ofix_session_logout(err, session, "%s", err_buf);
 	} else if (handle_session_msg(err, session, mt, msg, seq)) {
-	    session->recv_seq = seq;
+	    // do not reset session->recv_seq
 	} else if (NULL != session->recv_cb) {
 	    keep = !session->recv_cb(session, msg, session->recv_ctx);
 	}
@@ -498,9 +508,12 @@ process_msg(ofixErr err, ofixSession session, ofixMsg msg) {
 	session->log(session->log_ctx, OFIX_WARN,
 		     "'%s' did not send the correct sequence number. Received %lld. Expected %lld.",
 		     session->tid, (long long)seq, (long long)session->recv_seq + 1);
-	session->recv_seq = seq;
-	keep = !session->recv_cb(session, msg, session->recv_ctx);
-	send_resend_request(err, session, session->recv_seq + 1, 0);
+	if (0 == strcmp("4", mt)) { // SequenceReset
+	    handle_session_msg(err, session, mt, msg, seq);
+	} else {
+	    send_resend_request(err, session, session->recv_seq + 1, 0);
+	    session->recv_seq = seq;
+	}
     } else if (handle_session_msg(err, session, mt, msg, seq)) {
 	session->recv_seq = seq;
     } else if (NULL != session->recv_cb) { // at last, an app valid message
@@ -696,8 +709,14 @@ ofix_session_send(ofixErr err, ofixSession session, ofixMsg msg) {
     ofix_msg_set_str(err, msg, OFIX_TargetCompIDTAG, session->tid);
 
     pthread_mutex_lock(&session->send_mutex);
-    if (NULL != (str = ofix_msg_get_str(err, msg, OFIX_MsgTypeTAG)) && '5' == *str && '\0' == str[1]) {
-	session->logout_sent = dtime();
+    if (NULL != (str = ofix_msg_get_str(err, msg, OFIX_MsgTypeTAG)) && '\0' == str[1]) {
+	if ('5' == *str) {
+	    session->logout_sent = dtime();
+	} else if ('4' == *str) {
+	    if (0 < (seq = ofix_msg_get_int(err, msg, OFIX_NewSeqNoTAG))) {
+		session->sent_seq = seq - 2; // ends up as 1 less than new seq
+	    }
+	}
     }
     session->sent_seq++;
     seq = session->sent_seq;

@@ -90,6 +90,9 @@ test_init(int argc, char **argv, const char *group_name, Test all_tests) {
 
     for (current_test = tests; NULL != current_test->name; current_test++) {
 	if (current_test->run) {
+	    if (1 <= test_verbose) {
+		test_print("  %s\n", current_test->name);
+	    }
 	    current_test->func();
 	}
     }
